@@ -434,11 +434,17 @@
     <Component class="javax.swing.JComboBox" name="concern">
       <Properties>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-          <StringArray count="4">
-            <StringItem index="0" value="General/Consultation"/>
+          <StringArray count="10">
+            <StringItem index="0" value="Course Advising"/>
             <StringItem index="1" value="Add/Drop Subjects"/>
-            <StringItem index="2" value="Request for Overload"/>
-            <StringItem index="3" value="Cross Enrollment"/>
+            <StringItem index="2" value="Conditional Enrollment"/>
+            <StringItem index="3" value="Application for Waiver"/>
+            <StringItem index="4" value="Returnees"/>
+            <StringItem index="5" value="Request for Overload"/>
+            <StringItem index="6" value="Request for Petition"/>
+            <StringItem index="7" value="Request for Crediting Subjects"/>
+            <StringItem index="8" value="Cross Enrollment"/>
+            <StringItem index="9" value="Department Chair Consultation"/>
           </StringArray>
         </Property>
         <Property name="enabled" type="boolean" value="false"/>

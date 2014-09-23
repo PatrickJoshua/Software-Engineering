@@ -409,7 +409,7 @@ public class Input extends javax.swing.JFrame {
 
         jLabel7.setText("Concern:");
 
-        concern.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "General/Consultation", "Add/Drop Subjects", "Request for Overload", "Cross Enrollment" }));
+        concern.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Course Advising", "Add/Drop Subjects", "Conditional Enrollment", "Application for Waiver", "Returnees", "Request for Overload", "Request for Petition", "Request for Crediting Subjects", "Cross Enrollment", "Department Chair Consultation" }));
         concern.setEnabled(false);
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Input Panel"));
