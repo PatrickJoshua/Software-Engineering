@@ -413,6 +413,7 @@ class Wait4Next extends Thread
         catch (IOException ioe)
         {
               JOptionPane.showMessageDialog(null, "Error occured. Please call the administrator.", "ALERT!", JOptionPane.ERROR_MESSAGE);
+              ioe.printStackTrace();
         }
         catch (UnsupportedAudioFileException uafe)
         {

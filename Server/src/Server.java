@@ -501,6 +501,7 @@ class ServerTest extends Thread
                                     ps.setDate(1, new java.sql.Date(new java.util.Date().getTime()));
                                     ps.setTime(2, new java.sql.Time(new java.util.Date().getTime()));
                                     ps.executeUpdate();
+                                    ps.close();
                                 } catch (SQLException ex) {
                                     Server.logg.append("[CS]Database error. " + ex.getMessage());
                                 }
@@ -648,6 +649,7 @@ class ServerTest extends Thread
                                     ps.setDate(1, new java.sql.Date(new java.util.Date().getTime()));
                                     ps.setTime(2, new java.sql.Time(new java.util.Date().getTime()));
                                     ps.executeUpdate();
+                                    ps.close();
                                 } catch (SQLException ex) {
                                     Server.logg.append("[IS]Database error. " + ex.getMessage());
                                 }
@@ -835,6 +837,7 @@ class ServerTest extends Thread
                         ps.setDate(1, new java.sql.Date(new java.util.Date().getTime()));
                         ps.setTime(2, new java.sql.Time(new java.util.Date().getTime()));
                         ps.executeUpdate();
+                        ps.close();
                     } catch (SQLException ex) {
                         Server.logg.append("[IT]Database error. " + ex.getMessage());
                     }
