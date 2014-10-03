@@ -19,14 +19,23 @@ import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.JSpinner;
 import javax.swing.text.DefaultCaret;
 import javax.swing.UIManager;
+import net.proteanit.sql.DbUtils;
 
 /**
  *
@@ -180,11 +189,13 @@ class ServerTest extends Thread
    public static File itQueueRecord = new File("Records/IT/IT_" + dateFormat.format(date) + ".csv");
    public static File csQueueRecord = new File("Records/CS/CS_" + dateFormat.format(date) + ".csv");
    public static File isQueueRecord = new File("Records/IS/IS_" + dateFormat.format(date) + ".csv");
+   Connection con = null;
 
-   public ServerTest(int port) throws IOException
+   public ServerTest(int port, Connection conn) throws IOException
    {
       serverSocket = new ServerSocket(port);
       //serverSocket.setSoTimeout(60000);
+      con = conn;
    }
 
    public boolean scanForDuplicate(String department, String studNum)
@@ -483,6 +494,17 @@ class ServerTest extends Thread
                             br.write(df.format(date) + "," + Global.csStudentPending + "," + Global.csConcernPending + "," + received);
                             br.newLine();
                             br.close();
+                            //write to database
+                            if(con != null) {
+                                try {
+                                    PreparedStatement ps = con.prepareStatement("insert into HISTORY values (" + Integer.parseInt(Global.csStudentPending) + ",'" + Global.csConcernPending + "','" + received + "',?,?)");
+                                    ps.setDate(1, new java.sql.Date(new java.util.Date().getTime()));
+                                    ps.setTime(2, new java.sql.Time(new java.util.Date().getTime()));
+                                    ps.executeUpdate();
+                                } catch (SQLException ex) {
+                                    Server.logg.append("[CS]Database error. " + ex.getMessage());
+                                }
+                            }
                         }
                         BufferedReader br = new BufferedReader(new FileReader(csqueue));
                         String getFromFile, upcoming;
@@ -619,6 +641,17 @@ class ServerTest extends Thread
                             br.write(df.format(date) + "," + Global.isStudentPending + "," + Global.isConcernPending + "," + received);
                             br.newLine();
                             br.close();
+                            //write to database
+                            if(con != null) {
+                                try {
+                                    PreparedStatement ps = con.prepareStatement("insert into HISTORY values (" + Integer.parseInt(Global.isStudentPending) + ",'" + Global.isConcernPending + "','" + received + "',?,?)");
+                                    ps.setDate(1, new java.sql.Date(new java.util.Date().getTime()));
+                                    ps.setTime(2, new java.sql.Time(new java.util.Date().getTime()));
+                                    ps.executeUpdate();
+                                } catch (SQLException ex) {
+                                    Server.logg.append("[IS]Database error. " + ex.getMessage());
+                                }
+                            }
                         }
                         BufferedReader br = new BufferedReader(new FileReader(isqueue));
                         String getFromFile, upcoming;
@@ -781,7 +814,7 @@ class ServerTest extends Thread
       }
    }
 
-   public static void nextIT()
+   public static void nextIT(Connection con)
    {
        try
        {
@@ -795,8 +828,19 @@ class ServerTest extends Thread
                 br.write(df.format(date) + "," + Global.itStudentPending + "," + Global.itConcernPending + "," + Server.remarks.getText());
                 br.newLine();
                 br.close();
+                //write to database
+                if(con != null) {
+                    try {
+                        PreparedStatement ps = con.prepareStatement("insert into HISTORY values (" + Integer.parseInt(Global.itStudentPending) + ",'" + Global.itConcernPending + "','" + Server.remarks.getText() + "',?,?)");
+                        ps.setDate(1, new java.sql.Date(new java.util.Date().getTime()));
+                        ps.setTime(2, new java.sql.Time(new java.util.Date().getTime()));
+                        ps.executeUpdate();
+                    } catch (SQLException ex) {
+                        Server.logg.append("[IT]Database error. " + ex.getMessage());
+                    }
+                }
             }
-           BufferedReader br = new BufferedReader(new FileReader(queue));
+            BufferedReader br = new BufferedReader(new FileReader(queue));
             String getFromFile, upcoming;
             getFromFile = br.readLine();
             if(getFromFile == null)
@@ -978,8 +1022,20 @@ public class Server extends javax.swing.JFrame {
             {
                         Server.logg.append("Failed to initialize Queue Records\n");
             }
+        //Connect to Databse    
+        try {
+            Server.logg.append("Attempting to connect to the database...\n");
+            Class.forName("org.apache.derby.jdbc.ClientDriver");
+            con = DriverManager.getConnection("jdbc:derby://localhost:1527/QueueDB", "dbadmin", "dba");
+            Server.logg.append("Database connection acquired.\n");
+        } catch (SQLException ex) {
+            Server.logg.append("Failed to connect to database. Records output will be redirected to excel files.\n");
+        } catch (ClassNotFoundException x) {
+            Server.logg.append("Error loading java database drivers.\n");
+        }
     }
-
+    
+    public static Connection con = null;
     static FileOutputStream fileOut;
     static ObjectOutputStream pwout;
     static FileInputStream fileIn;
@@ -1093,6 +1149,12 @@ public class Server extends javax.swing.JFrame {
         jLabel43 = new javax.swing.JLabel();
         changePortsBT = new javax.swing.JButton();
         cancelChangePort = new javax.swing.JButton();
+        viewDatabase = new javax.swing.JFrame();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        table = new javax.swing.JTable();
+        jPanel6 = new javax.swing.JPanel();
+        sqlTF = new javax.swing.JTextField();
+        sqlBT = new javax.swing.JButton();
         logPanel = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         logg = new javax.swing.JTextArea();
@@ -1122,6 +1184,15 @@ public class Server extends javax.swing.JFrame {
         viewITrecord = new javax.swing.JMenuItem();
         viewCSrecord = new javax.swing.JMenuItem();
         viewISrecord = new javax.swing.JMenuItem();
+        jSeparator3 = new javax.swing.JPopupMenu.Separator();
+        viewAllMenu = new javax.swing.JMenu();
+        viewAll = new javax.swing.JMenuItem();
+        jSeparator4 = new javax.swing.JPopupMenu.Separator();
+        allIT = new javax.swing.JMenuItem();
+        allCS = new javax.swing.JMenuItem();
+        allIS = new javax.swing.JMenuItem();
+        jSeparator5 = new javax.swing.JPopupMenu.Separator();
+        viewDB = new javax.swing.JMenuItem();
         jMenu3 = new javax.swing.JMenu();
         jMenuItem4 = new javax.swing.JMenuItem();
 
@@ -1177,7 +1248,6 @@ public class Server extends javax.swing.JFrame {
         adminMode.setTitle("Administrator Panel");
         adminMode.setMinimumSize(new java.awt.Dimension(304, 280));
         adminMode.setModal(true);
-        adminMode.setPreferredSize(new java.awt.Dimension(304, 280));
 
         changePW.setText("Modify Password");
         changePW.setToolTipText("Changes your administrator Password");
@@ -1671,7 +1741,7 @@ public class Server extends javax.swing.JFrame {
         jLabel30.setText("Karlo Antonio Espiritu");
 
         jLabel31.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel31.setText("Version 1.2");
+        jLabel31.setText("Version 2.0");
 
         org.jdesktop.layout.GroupLayout aboutLayout = new org.jdesktop.layout.GroupLayout(about.getContentPane());
         about.getContentPane().setLayout(aboutLayout);
@@ -1887,6 +1957,70 @@ public class Server extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
+        viewDatabase.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        viewDatabase.setTitle("View Database");
+
+        table.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+
+            }
+        ));
+        jScrollPane1.setViewportView(table);
+
+        jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("SQL Statement"));
+
+        sqlBT.setText("Execute SQL");
+        sqlBT.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                sqlBTActionPerformed(evt);
+            }
+        });
+
+        org.jdesktop.layout.GroupLayout jPanel6Layout = new org.jdesktop.layout.GroupLayout(jPanel6);
+        jPanel6.setLayout(jPanel6Layout);
+        jPanel6Layout.setHorizontalGroup(
+            jPanel6Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel6Layout.createSequentialGroup()
+                .addContainerGap()
+                .add(sqlTF)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(sqlBT)
+                .addContainerGap())
+        );
+        jPanel6Layout.setVerticalGroup(
+            jPanel6Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel6Layout.createSequentialGroup()
+                .addContainerGap()
+                .add(jPanel6Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(sqlTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(sqlBT))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        org.jdesktop.layout.GroupLayout viewDatabaseLayout = new org.jdesktop.layout.GroupLayout(viewDatabase.getContentPane());
+        viewDatabase.getContentPane().setLayout(viewDatabaseLayout);
+        viewDatabaseLayout.setHorizontalGroup(
+            viewDatabaseLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(viewDatabaseLayout.createSequentialGroup()
+                .addContainerGap()
+                .add(viewDatabaseLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 375, Short.MAX_VALUE)
+                    .add(jPanel6, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        viewDatabaseLayout.setVerticalGroup(
+            viewDatabaseLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(viewDatabaseLayout.createSequentialGroup()
+                .addContainerGap()
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 208, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jPanel6, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("UST IICS Queuing System Server");
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -1895,8 +2029,8 @@ public class Server extends javax.swing.JFrame {
             }
         });
 
-        logg.setColumns(20);
         logg.setEditable(false);
+        logg.setColumns(20);
         logg.setRows(5);
         logg.setFocusable(false);
         logg.setRequestFocusEnabled(false);
@@ -1911,7 +2045,7 @@ public class Server extends javax.swing.JFrame {
             .add(logPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(logPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 398, Short.MAX_VALUE)
+                    .add(jScrollPane2)
                     .add(jLabel21))
                 .addContainerGap())
         );
@@ -1920,12 +2054,10 @@ public class Server extends javax.swing.JFrame {
             .add(logPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(jLabel21)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .add(jScrollPane2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 149, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 149, Short.MAX_VALUE)
                 .addContainerGap())
         );
-
-        getContentPane().add(logPanel, java.awt.BorderLayout.PAGE_END);
 
         queueControlPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("I.T. Queue Controller"));
 
@@ -1961,7 +2093,7 @@ public class Server extends javax.swing.JFrame {
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jScrollPane3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 180, Short.MAX_VALUE)
+            .add(jScrollPane3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 166, Short.MAX_VALUE)
         );
 
         callAgain.setText("Call Again");
@@ -1987,16 +2119,19 @@ public class Server extends javax.swing.JFrame {
             .add(queueControlPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(queueControlPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jLabel22)
-                    .add(itNowServingTxt)
-                    .add(itConcernTxt)
-                    .add(nextTxt)
+                    .add(remarks)
                     .add(queueControlPanelLayout.createSequentialGroup()
-                        .add(nextBT)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(callAgain))
-                    .add(jLabel44)
-                    .add(remarks, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 234, Short.MAX_VALUE))
+                        .add(queueControlPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(queueControlPanelLayout.createSequentialGroup()
+                                .add(nextBT)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(callAgain))
+                            .add(jLabel22)
+                            .add(itNowServingTxt)
+                            .add(itConcernTxt)
+                            .add(nextTxt)
+                            .add(jLabel44))
+                        .add(0, 118, Short.MAX_VALUE)))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -2015,17 +2150,15 @@ public class Server extends javax.swing.JFrame {
                         .add(jLabel44)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(remarks, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 9, Short.MAX_VALUE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(nextTxt)
                         .add(18, 18, 18)
                         .add(queueControlPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                             .add(nextBT)
                             .add(callAgain)))
-                    .add(jPanel3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .add(jPanel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
-
-        getContentPane().add(queueControlPanel, java.awt.BorderLayout.CENTER);
 
         jMenu1.setText("Menu");
         jMenu1.addActionListener(new java.awt.event.ActionListener() {
@@ -2110,6 +2243,53 @@ public class Server extends javax.swing.JFrame {
             }
         });
         viewISfile.add(viewISrecord);
+        viewISfile.add(jSeparator3);
+
+        viewAllMenu.setText("Open in File Browser");
+
+        viewAll.setText("View All Records Directory");
+        viewAll.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                viewAllActionPerformed(evt);
+            }
+        });
+        viewAllMenu.add(viewAll);
+        viewAllMenu.add(jSeparator4);
+
+        allIT.setText("I.T. Records Directory");
+        allIT.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                allITActionPerformed(evt);
+            }
+        });
+        viewAllMenu.add(allIT);
+
+        allCS.setText("C.S. Records Directory");
+        allCS.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                allCSActionPerformed(evt);
+            }
+        });
+        viewAllMenu.add(allCS);
+
+        allIS.setText("I.S. Records Directory");
+        allIS.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                allISActionPerformed(evt);
+            }
+        });
+        viewAllMenu.add(allIS);
+
+        viewISfile.add(viewAllMenu);
+        viewISfile.add(jSeparator5);
+
+        viewDB.setText("View Database");
+        viewDB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                viewDBActionPerformed(evt);
+            }
+        });
+        viewISfile.add(viewDB);
 
         jMenuBar1.add(viewISfile);
 
@@ -2127,6 +2307,21 @@ public class Server extends javax.swing.JFrame {
 
         setJMenuBar(jMenuBar1);
 
+        org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(queueControlPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .add(logPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(layout.createSequentialGroup()
+                .add(queueControlPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(logPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
@@ -2142,6 +2337,7 @@ public class Server extends javax.swing.JFrame {
             if(!file.exists())
             {
                 file.createNewFile();
+                Runtime.getRuntime().exec("attrib +H .pw.ser");
                 fileOut = new FileOutputStream(file);
                 pwout = new ObjectOutputStream(fileOut);
                 String e = "";
@@ -2330,7 +2526,7 @@ public class Server extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem5ActionPerformed
 
     private void nextBTActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextBTActionPerformed
-        ServerTest.nextIT();
+        ServerTest.nextIT(con);
     }//GEN-LAST:event_nextBTActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
@@ -2399,7 +2595,7 @@ public class Server extends javax.swing.JFrame {
         try
         {
             if(Global.mac)
-                Runtime.getRuntime().exec("start open Records/IT/" + ServerTest.itQueueRecord.getName());
+                Runtime.getRuntime().exec("open Records/IT/" + ServerTest.itQueueRecord.getName());
             else if(System.getProperty("os.name").contains("Windows"))
             {
     //            Runtime.getRuntime().exec("start excel Records\\IT\\" + ServerTest.itQueueRecord.getName());
@@ -2453,6 +2649,108 @@ public class Server extends javax.swing.JFrame {
         nextBTActionPerformed(evt);
     }//GEN-LAST:event_remarksActionPerformed
 
+    private void viewAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewAllActionPerformed
+        try
+        {
+            if(Global.mac)
+                Runtime.getRuntime().exec("open Records/");
+            else if(System.getProperty("os.name").contains("Windows"))
+                Runtime.getRuntime().exec("cmd /c explorer.exe Records");
+            else if(System.getProperty("os.name").contains("Linux"))
+                Runtime.getRuntime().exec("gnome-open Records/");
+            else
+                JOptionPane.showMessageDialog(rootPane, "You can open the folder located at Records/", "Unsupported Operating System", JOptionPane.ERROR_MESSAGE);
+        }
+        catch (IOException ioe)
+        {
+            JOptionPane.showMessageDialog(rootPane, "Failed to launch file browser", "Launching Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_viewAllActionPerformed
+
+    private void allITActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_allITActionPerformed
+        try
+        {
+            if(Global.mac)
+                Runtime.getRuntime().exec("open Records/IT/");
+            else if(System.getProperty("os.name").contains("Windows"))
+                Runtime.getRuntime().exec("cmd /c explorer.exe Records\\IT");
+            else if(System.getProperty("os.name").contains("Linux"))
+                Runtime.getRuntime().exec("gnome-open Records/IT/");
+            else
+                JOptionPane.showMessageDialog(rootPane, "You can open the folder located at Records/IT", "Unsupported Operating System", JOptionPane.ERROR_MESSAGE);
+        }
+        catch (IOException ioe)
+        {
+            JOptionPane.showMessageDialog(rootPane, "Failed to launch file browser", "Launching Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_allITActionPerformed
+
+    private void allCSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_allCSActionPerformed
+        try
+        {
+            if(Global.mac)
+                Runtime.getRuntime().exec("open Records/CS/");
+            else if(System.getProperty("os.name").contains("Windows"))
+                Runtime.getRuntime().exec("cmd /c explorer.exe Records\\CS");
+            else if(System.getProperty("os.name").contains("Linux"))
+                Runtime.getRuntime().exec("gnome-open Records/CS/");
+            else
+                JOptionPane.showMessageDialog(rootPane, "You can open the folder located at Records/CS", "Unsupported Operating System", JOptionPane.ERROR_MESSAGE);
+        }
+        catch (IOException ioe)
+        {
+            JOptionPane.showMessageDialog(rootPane, "Failed to launch file browser", "Launching Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_allCSActionPerformed
+
+    private void allISActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_allISActionPerformed
+        try
+        {
+            if(Global.mac)
+                Runtime.getRuntime().exec("open Records/IS/");
+            else if(System.getProperty("os.name").contains("Windows"))
+                Runtime.getRuntime().exec("cmd /c explorer.exe Records\\IS");
+            else if(System.getProperty("os.name").contains("Linux"))
+                Runtime.getRuntime().exec("gnome-open Records/IS/");
+            else
+                JOptionPane.showMessageDialog(rootPane, "You can open the folder located at Records/IS", "Unsupported Operating System", JOptionPane.ERROR_MESSAGE);
+        }
+        catch (IOException ioe)
+        {
+            JOptionPane.showMessageDialog(rootPane, "Failed to launch file browser", "Launching Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_allISActionPerformed
+
+    private void sqlBTActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sqlBTActionPerformed
+        executeSQL("HISTORY");
+    }//GEN-LAST:event_sqlBTActionPerformed
+
+    private void viewDBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewDBActionPerformed
+        sqlTF.setText("select * from HISTORY");
+        viewDatabase.pack();
+        viewDatabase.setLocationRelativeTo(null);
+        viewDatabase.setVisible(true);
+        executeSQL("HISTORY");
+    }//GEN-LAST:event_viewDBActionPerformed
+
+    void executeSQL(String DBtable) {
+        try {
+            Statement stmt = con.createStatement();
+            ResultSet rs;
+            if(sqlTF.getText().startsWith("select"))
+                rs = stmt.executeQuery(sqlTF.getText());
+            else {
+                JOptionPane.showMessageDialog(null, stmt.executeUpdate(sqlTF.getText()) + " row(s) affected", "SQL Result", JOptionPane.INFORMATION_MESSAGE);
+                rs = stmt.executeQuery("select * from " + DBtable);
+            }
+            table.setModel(DbUtils.resultSetToTableModel(rs));
+            rs.close();
+            stmt.close();
+        } catch (SQLException sqle) {
+            JOptionPane.showMessageDialog(null, "Error executing statement: " + sqlTF.getText() + "\n" + sqle.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
     /**
     * @param args the command line arguments
     */
@@ -2544,28 +2842,28 @@ public class Server extends javax.swing.JFrame {
                             }
                     }
                       logg.append("Connect the clients through the IP Addresses\nlisted above and the port numbers below.\n");
-                     Thread inputThread = new ServerTest(port1);
+                     Thread inputThread = new ServerTest(port1,null);
                      inputThread.start();
-                     Thread CSControllerThread = new ServerTest(port2);
+                     Thread CSControllerThread = new ServerTest(port2,con);
                      CSControllerThread.start();
-                     Thread CSReceiverThread = new ServerTest(port3);
+                     Thread CSReceiverThread = new ServerTest(port3,null);
                      CSReceiverThread.start();
-                     Thread displayThread = new ServerTest(port4);
+                     Thread displayThread = new ServerTest(port4,null);
                      displayThread.start();
-                     Thread displayCSupcomingThread = new ServerTest(port5);
+                     Thread displayCSupcomingThread = new ServerTest(port5,null);
                      displayCSupcomingThread.start();
 
-                     Thread ISControllerThread = new ServerTest(port6);
+                     Thread ISControllerThread = new ServerTest(port6,con);
                      ISControllerThread.start();
-                     Thread ISReceiverThread = new ServerTest(port7);
+                     Thread ISReceiverThread = new ServerTest(port7,null);
                      ISReceiverThread.start();
-                     Thread displayISupcomingThread = new ServerTest(port8);
+                     Thread displayISupcomingThread = new ServerTest(port8,null);
                      displayISupcomingThread.start();
 
                      Thread cutoffListenerThread = new cutoff(port9);
                      cutoffListenerThread.start();
 
-                     Thread displayITupcomingThread = new ServerTest(port10);
+                     Thread displayITupcomingThread = new ServerTest(port10,null);
                      displayITupcomingThread.start();
 
                      ServerTest.updateITQueueList();
@@ -2584,6 +2882,9 @@ public class Server extends javax.swing.JFrame {
     private javax.swing.JDialog about;
     private javax.swing.JMenuItem adminMenu;
     private javax.swing.JDialog adminMode;
+    private javax.swing.JMenuItem allCS;
+    private javax.swing.JMenuItem allIS;
+    private javax.swing.JMenuItem allIT;
     private javax.swing.JButton callAgain;
     private javax.swing.JButton cancelChangePort;
     private javax.swing.JButton changePW;
@@ -2676,10 +2977,15 @@ public class Server extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator2;
+    private javax.swing.JPopupMenu.Separator jSeparator3;
+    private javax.swing.JSeparator jSeparator4;
+    private javax.swing.JSeparator jSeparator5;
     public static javax.swing.JSpinner jSpinner1;
     public static javax.swing.JSpinner jSpinner10;
     public static javax.swing.JSpinner jSpinner11;
@@ -2705,7 +3011,14 @@ public class Server extends javax.swing.JFrame {
     public static javax.swing.JTextField remarks;
     private javax.swing.JDialog setLimit;
     private javax.swing.JButton setLimitBT;
+    private javax.swing.JButton sqlBT;
+    private javax.swing.JTextField sqlTF;
+    public javax.swing.JTable table;
+    private javax.swing.JMenuItem viewAll;
+    private javax.swing.JMenu viewAllMenu;
     private javax.swing.JMenuItem viewCSrecord;
+    private javax.swing.JMenuItem viewDB;
+    public static javax.swing.JFrame viewDatabase;
     private javax.swing.JMenu viewISfile;
     private javax.swing.JMenuItem viewISrecord;
     private javax.swing.JMenuItem viewITrecord;
