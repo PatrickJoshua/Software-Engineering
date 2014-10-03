@@ -497,7 +497,7 @@ class ServerTest extends Thread
                             //write to database
                             if(con != null) {
                                 try {
-                                    PreparedStatement ps = con.prepareStatement("insert into HISTORY values (" + Integer.parseInt(Global.csStudentPending) + ",'" + Global.csConcernPending + "','" + received + "',?,?)");
+                                    PreparedStatement ps = con.prepareStatement("insert into HISTORY values (" + Integer.parseInt(Global.csStudentPending) + ",'CS','" + Global.csConcernPending + "','" + received + "',?,?)");
                                     ps.setDate(1, new java.sql.Date(new java.util.Date().getTime()));
                                     ps.setTime(2, new java.sql.Time(new java.util.Date().getTime()));
                                     ps.executeUpdate();
@@ -645,7 +645,7 @@ class ServerTest extends Thread
                             //write to database
                             if(con != null) {
                                 try {
-                                    PreparedStatement ps = con.prepareStatement("insert into HISTORY values (" + Integer.parseInt(Global.isStudentPending) + ",'" + Global.isConcernPending + "','" + received + "',?,?)");
+                                    PreparedStatement ps = con.prepareStatement("insert into HISTORY values (" + Integer.parseInt(Global.isStudentPending) + ",'IS','" + Global.isConcernPending + "','" + received + "',?,?)");
                                     ps.setDate(1, new java.sql.Date(new java.util.Date().getTime()));
                                     ps.setTime(2, new java.sql.Time(new java.util.Date().getTime()));
                                     ps.executeUpdate();
@@ -833,7 +833,7 @@ class ServerTest extends Thread
                 //write to database
                 if(con != null) {
                     try {
-                        PreparedStatement ps = con.prepareStatement("insert into HISTORY values (" + Integer.parseInt(Global.itStudentPending) + ",'" + Global.itConcernPending + "','" + Server.remarks.getText() + "',?,?)");
+                        PreparedStatement ps = con.prepareStatement("insert into HISTORY values (" + Integer.parseInt(Global.itStudentPending) + ",'IT','" + Global.itConcernPending + "','" + Server.remarks.getText() + "',?,?)");
                         ps.setDate(1, new java.sql.Date(new java.util.Date().getTime()));
                         ps.setTime(2, new java.sql.Time(new java.util.Date().getTime()));
                         ps.executeUpdate();
