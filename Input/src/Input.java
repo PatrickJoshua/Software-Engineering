@@ -3,11 +3,13 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.prefs.Preferences;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
@@ -64,24 +66,35 @@ class cutoffListener extends Thread
                     Input.ConnectToServerBT.setText("Status: Lunch Break");
                 else if(serverCommand.equalsIgnoreCase("resume"))
                     Input.ConnectToServerBT.setText("Status: System is Online");
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                }
             }
-        }
-        catch (IOException ex) {
+        } catch (SocketException se) {
+            JOptionPane.showMessageDialog(null, "The system has detected that the server is down.\nNow shutting down this unit", "Connection Error", JOptionPane.ERROR_MESSAGE);
+            System.exit(1);
+        } catch (IOException ex) {
             Logger.getLogger(cutoffListener.class.getName()).log(Level.SEVERE, null, ex);
-        }    }
+        }    
+    }
 }
 
 public class Input extends javax.swing.JFrame {
 
-    /**
-     * Creates new form Input
-     */
+    Preferences prefs = Preferences.userRoot();
+    
     public Input() {
         initComponents();
-        ConnectToServerBT.requestFocus();
-        progress.setVisible(false);
-        connectToServer.setLocationRelativeTo(null);
-        connectToServer.setVisible(true);
+        if(prefs.get("SERVERIP", "").isEmpty()) {
+            ConnectToServerBT.requestFocus();
+            progress.setVisible(false);
+            connectToServer.setLocationRelativeTo(null);
+            connectToServer.setVisible(true);
+        } else {
+            ConnectNowActionPerformed(new java.awt.event.ActionEvent(C, port, ServerIP));
+        }
     }
     
     public static String ServerIP;
@@ -609,6 +622,7 @@ public class Input extends javax.swing.JFrame {
     }//GEN-LAST:event_ConnectToServerBTActionPerformed
 
     private void ConnectNowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ConnectNowActionPerformed
+        ServerIPTextField.setText(prefs.get("SERVERIP", ""));
         if(portTextField.getText().isEmpty())
             port = 6066;
         else
@@ -661,6 +675,7 @@ public class Input extends javax.swing.JFrame {
             C.setEnabled(connected);
             Thread cutoffThread = new cutoffListener();
             cutoffThread.start();
+            prefs.put("SERVERIP", ServerIP);
         }
         catch (Exception uhe)
         {

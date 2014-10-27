@@ -26,7 +26,8 @@ $RECYCLE.BIN/
 .LSOverride
 
 # Icon must end with two \r
-Icon
+Icon
+
 
 # Thumbnails
 ._*
@@ -42,7 +43,6 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-*.class
 
 # Mobile Tools for Java (J2ME) 
 .mtj.tmp/ 
@@ -54,6 +54,46 @@ Temporary Items
  
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml 
 hs_err_pid* 
+
+Server/nbproject/private/
+Server/build/
+Server/nbbuild/
+Server/dist/
+Server/nbdist/
+Server/nbactions.xml
+Server/nb-configuration.xml
+
+Input/nbproject/private/
+Input/build/
+Input/nbbuild/
+Input/dist/
+Input/nbdist/
+Input/nbactions.xml
+Input/nb-configuration.xml
+
+Display/nbproject/private/
+Display/build/
+Display/nbbuild/
+Display/dist/
+Display/nbdist/
+Display/nbactions.xml
+Display/nb-configuration.xml
+
+ControllerCS/nbproject/private/
+ControllerCS/build/
+ControllerCS/nbbuild/
+ControllerCS/dist/
+ControllerCS/nbdist/
+ControllerCS/nbactions.xml
+ControllerCS/nb-configuration.xml
+
+ControllerIS/nbproject/private/
+ControllerIS/build/
+ControllerIS/nbbuild/
+ControllerIS/dist/
+ControllerIS/nbdist/
+ControllerIS/nbactions.xml
+ControllerIS/nb-configuration.xml
 
 */nbproject/private/
 */build/

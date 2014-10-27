@@ -8,6 +8,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketException;
+import java.util.prefs.Preferences;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
@@ -68,6 +70,9 @@ class ReceiverThread extends Thread
                 Globalvars.lastIndex = i;
                 ControllerIS.upcomingList.setListData(Globalvars.upcomingIS);
             }
+        }  catch (SocketException se) {
+            JOptionPane.showMessageDialog(null, "The system has detected that the server is down.\nNow shutting down this unit", "Connection Error", JOptionPane.ERROR_MESSAGE);
+            System.exit(1);
         }
         catch (IOException ioe)
         {
@@ -88,8 +93,22 @@ class ReceiverThread extends Thread
                 Globalvars.lastIndex++;
                 ControllerIS.upcomingList.setListData(Globalvars.upcomingIS);
                 Globalvars.writeIS();
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                }
             }
+        } catch (SocketException se) {
+            JOptionPane.showMessageDialog(null, "The system has detected that the server is down.\nNow shutting down this unit", "Connection Error", JOptionPane.ERROR_MESSAGE);
+            System.exit(1);
         }
+//        catch (SocketException se) {
+//            int reply = JOptionPane.showConfirmDialog(null, "Cannot display recovered upcoming queue.\nOperations can still continue, if server is still up\n"
+//                    + "If not, do you want to shut this unit down?", "Connection Error", JOptionPane.YES_NO_OPTION);
+//            if(reply == JOptionPane.YES_OPTION)
+//                System.exit(reply);
+//        }
         catch (IOException ioe)
         {
             JOptionPane.showMessageDialog(null, "Error retreiving data from server.\nReal-time upcoming clients cannot be updated\nas of the moment. Basic Operation can still continue.", "Retreive Failed", JOptionPane.ERROR_MESSAGE);
@@ -99,15 +118,18 @@ class ReceiverThread extends Thread
 
 public class ControllerIS extends javax.swing.JFrame {
 
-    /**
-     * Creates new form Input
-     */
+    Preferences prefs = Preferences.userRoot();
+
     public ControllerIS() {
         initComponents();
-        ConnectToServerBT.requestFocus();
-        progress.setVisible(false);
-        connectToServer.setLocationRelativeTo(null);
-        connectToServer.setVisible(true);
+        if(prefs.get("SERVERIP", "").isEmpty()) {
+            ConnectToServerBT.requestFocus();
+            progress.setVisible(false);
+            connectToServer.setLocationRelativeTo(null);
+            connectToServer.setVisible(true);
+        } else {
+            ConnectNowActionPerformed(new java.awt.event.ActionEvent(this, WIDTH, null));
+        }
     }
     
     boolean connected = false;
@@ -281,7 +303,7 @@ public class ControllerIS extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("I.S. Queue Controller");
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
@@ -407,6 +429,7 @@ public class ControllerIS extends javax.swing.JFrame {
     }//GEN-LAST:event_ConnectToServerBTActionPerformed
 
     private void ConnectNowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ConnectNowActionPerformed
+        ServerIPTextField.setText(prefs.get("SERVERIP", ""));
         if(portTextField.getText().isEmpty())
             Globalvars.port = 6071;
         else
@@ -442,6 +465,7 @@ public class ControllerIS extends javax.swing.JFrame {
             callISAgain.setEnabled(connected);
             Thread receive = new ReceiverThread();
             receive.start();
+            prefs.put("SERVERIP", Globalvars.ServerIP);
         }
         catch (Exception uhe)
         {
@@ -507,10 +531,9 @@ public class ControllerIS extends javax.swing.JFrame {
     }//GEN-LAST:event_remarksActionPerformed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-        if((JOptionPane.showConfirmDialog(rootPane, "Are you sure you want to exit?","Confirm Exit",JOptionPane.YES_NO_OPTION))==JOptionPane.YES_OPTION)
-        {
+        int reply = JOptionPane.showConfirmDialog(rootPane, "Are you sure you want to exit?","Confirm Exit",JOptionPane.YES_NO_OPTION);
+        if(reply==JOptionPane.YES_OPTION)
             System.exit(0);
-        }
     }//GEN-LAST:event_formWindowClosing
 
     /**

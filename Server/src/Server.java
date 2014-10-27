@@ -422,6 +422,11 @@ class ServerTest extends Thread
                             }
                         }
                     }
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException ex) {
+                        Server.logg.append("Thread interrupted.\n");
+                    }
                 }
                 //out.writeUTF("Thank you for connecting to " + server.getLocalSocketAddress() + "\nGoodbye!");
 
@@ -467,6 +472,11 @@ class ServerTest extends Thread
                          }
                         Global.nextCommand=false;
                         Global.toDisplay=null;
+                    }
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ex) {
+                        Server.logg.append("Thread interrupted.\n");
                     }
                 }
             }
@@ -588,6 +598,11 @@ class ServerTest extends Thread
                             }
                         }
                     }
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException ex) {
+                        Server.logg.append("Thread interrupted.\n");
+                    }
                 }
             }
             else if(identity.equals("CSreceiver"))
@@ -602,6 +617,11 @@ class ServerTest extends Thread
                         out.writeUTF(Global.toCS);
                         Global.newCSStudent=false;
                     }
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException ex) {
+                        Server.logg.append("Thread interrupted.\n");
+                    }
                 }
             }
             else if(identity.equals("dispCSreceiver"))
@@ -615,6 +635,11 @@ class ServerTest extends Thread
                     {
                         out.writeUTF(Global.toCS);
                         Global.newCSStudentDisp=false;
+                    }
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ex) {
+                        Server.logg.append("Thread interrupted.\n");
                     }
                 }
             }
@@ -736,6 +761,11 @@ class ServerTest extends Thread
                             }
                         }
                     }
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException ex) {
+                        Server.logg.append("Thread interrupted.\n");
+                    }
                 }
             }
             else if(identity.equals("ISreceiver"))
@@ -749,6 +779,11 @@ class ServerTest extends Thread
                     {
                         out.writeUTF(Global.toIS);
                         Global.newISStudent=false;
+                    }
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException ex) {
+                        Server.logg.append("Thread interrupted.\n");
                     }
                 }
             }
@@ -764,6 +799,11 @@ class ServerTest extends Thread
                         out.writeUTF(Global.toIS);
                         Global.newISStudentDisp=false;
                     }
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ex) {
+                        Server.logg.append("Thread interrupted.\n");
+                    }
                 }
             }
             else if(identity.equals("dispITreceiver"))
@@ -777,6 +817,11 @@ class ServerTest extends Thread
                     {
                         out.writeUTF(Global.toIT);
                         Global.newITStudentDisp=false;
+                    }
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ex) {
+                        Server.logg.append("Thread interrupted.\n");
                     }
                 }
             }
@@ -1744,7 +1789,7 @@ public class Server extends javax.swing.JFrame {
         jLabel30.setText("Karlo Antonio Espiritu");
 
         jLabel31.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel31.setText("Version 2.0");
+        jLabel31.setText("Version 2.5");
 
         org.jdesktop.layout.GroupLayout aboutLayout = new org.jdesktop.layout.GroupLayout(about.getContentPane());
         about.getContentPane().setLayout(aboutLayout);
@@ -2987,8 +3032,8 @@ public class Server extends javax.swing.JFrame {
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator2;
     private javax.swing.JPopupMenu.Separator jSeparator3;
-    private javax.swing.JSeparator jSeparator4;
-    private javax.swing.JSeparator jSeparator5;
+    private javax.swing.JPopupMenu.Separator jSeparator4;
+    private javax.swing.JPopupMenu.Separator jSeparator5;
     public static javax.swing.JSpinner jSpinner1;
     public static javax.swing.JSpinner jSpinner10;
     public static javax.swing.JSpinner jSpinner11;

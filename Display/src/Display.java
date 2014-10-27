@@ -9,9 +9,11 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.prefs.Preferences;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -127,6 +129,11 @@ class CSReceiverThread extends Thread
                 Globalvars.CSlastIndex++;
                 Display.CSupcoming.setListData(Globalvars.upcomingCS);
                 Globalvars.writeCS();
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                }
             }
         }
         catch (IOException ioe)
@@ -183,6 +190,11 @@ class ISReceiverThread extends Thread
                 Globalvars.ISlastIndex++;
                 Display.ISupcoming.setListData(Globalvars.upcomingIS);
                 Globalvars.writeIS();
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                }
             }
         }
         catch (IOException ioe)
@@ -239,6 +251,11 @@ class ITReceiverThread extends Thread
                 Globalvars.ITlastIndex++;
                 Display.ITupcoming.setListData(Globalvars.upcomingIT);
                 Globalvars.writeIS();
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                }
             }
         }
         catch (IOException ioe)
@@ -260,7 +277,6 @@ class Wait4Next extends Thread
         MediaPlayer mediaPlayer = new MediaPlayer(hit);*/
         try
         {
-            
             while(true)
              {
                  received = Display.inFromServer.readUTF();
@@ -408,7 +424,15 @@ class Wait4Next extends Thread
                      else
                          JOptionPane.showMessageDialog(null, "Error occured. Please call the administrator.\nError: Unidentified department has queued.", "ALERT!", JOptionPane.ERROR_MESSAGE);
                  }
+                 try {
+                    Thread.sleep(500);
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                }
              }
+        } catch (SocketException se) {
+            JOptionPane.showMessageDialog(null, "The system has detected that the server is down.\nNow shutting down this unit", "Connection Error", JOptionPane.ERROR_MESSAGE);
+            System.exit(1);
         }
         catch (IOException ioe)
         {
@@ -429,15 +453,18 @@ class Wait4Next extends Thread
 
 public class Display extends javax.swing.JFrame {
 
-    /**
-     * Creates new form Input
-     */
+    Preferences prefs = Preferences.userRoot();
+
     public Display() {
         initComponents();
-        ConnectToServerBT.requestFocus();
-        progress.setVisible(false);
-        connectToServer.setLocationRelativeTo(null);
-        connectToServer.setVisible(true);
+        if(prefs.get("SERVERIP", "").isEmpty()) {
+            ConnectToServerBT.requestFocus();
+            progress.setVisible(false);
+            connectToServer.setLocationRelativeTo(null);
+            connectToServer.setVisible(true);
+        } else {
+            ConnectNowActionPerformed(new java.awt.event.ActionEvent(this, WIDTH, null));
+        }
     }
     
     public static void blinkIT()
@@ -917,6 +944,7 @@ public class Display extends javax.swing.JFrame {
     }//GEN-LAST:event_ConnectToServerBTActionPerformed
 
     private void ConnectNowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ConnectNowActionPerformed
+        ServerIPTextField.setText(prefs.get("SERVERIP", ""));
         if(portTextField.getText().isEmpty())
             Globalvars.port = 6069;
         else
@@ -959,6 +987,8 @@ public class Display extends javax.swing.JFrame {
 
             if(System.getProperty("os.name").contains("Mac OS X"))
                     Globalvars.mac = true;
+            
+            prefs.put("SERVERIP", Globalvars.ServerIP);
         }
         catch (Exception uhe)
         {

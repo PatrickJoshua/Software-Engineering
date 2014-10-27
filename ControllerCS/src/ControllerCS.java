@@ -8,6 +8,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketException;
+import java.util.prefs.Preferences;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
@@ -88,7 +90,15 @@ class ReceiverThread extends Thread
                 Globalvars.lastIndex++;
                 ControllerCS.upcomingList.setListData(Globalvars.upcomingCS);
                 Globalvars.writeCS();
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                }
             }
+        } catch (SocketException se) {
+            JOptionPane.showMessageDialog(null, "The system has detected that the server is down.\nNow shutting down this unit", "Connection Error", JOptionPane.ERROR_MESSAGE);
+            System.exit(1);
         }
         catch (IOException ioe)
         {
@@ -99,15 +109,18 @@ class ReceiverThread extends Thread
 
 public class ControllerCS extends javax.swing.JFrame {
 
-    /**
-     * Creates new form Input
-     */
+    Preferences prefs = Preferences.userRoot();
+
     public ControllerCS() {
         initComponents();
-        ConnectToServerBT.requestFocus();
-        progress.setVisible(false);
-        connectToServer.setLocationRelativeTo(null);
-        connectToServer.setVisible(true);
+        if(prefs.get("SERVERIP", "").isEmpty()) {
+            ConnectToServerBT.requestFocus();
+            progress.setVisible(false);
+            connectToServer.setLocationRelativeTo(null);
+            connectToServer.setVisible(true);
+        } else {
+            ConnectNowActionPerformed(new java.awt.event.ActionEvent(this, WIDTH, null));
+        }
     }
     
     boolean connected = false;
@@ -406,6 +419,7 @@ public class ControllerCS extends javax.swing.JFrame {
     }//GEN-LAST:event_ConnectToServerBTActionPerformed
 
     private void ConnectNowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ConnectNowActionPerformed
+        ServerIPTextField.setText(prefs.get("SERVERIP", ""));
         if(portTextField.getText().isEmpty())
             Globalvars.port = 6067;
         else
@@ -441,6 +455,7 @@ public class ControllerCS extends javax.swing.JFrame {
             callCSAgain.setEnabled(connected);
             Thread receive = new ReceiverThread();
             receive.start();
+            prefs.put("SERVERIP", Globalvars.ServerIP);
         }
         catch (Exception uhe)
         {
