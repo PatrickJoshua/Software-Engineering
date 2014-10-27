@@ -2824,7 +2824,7 @@ public class Server extends javax.swing.JFrame {
                       logg.append("This server's IP Addresses:\n");
                      String ip;
                      Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-                    while (interfaces.hasMoreElements()) {
+                     while (interfaces.hasMoreElements()) {
                         NetworkInterface iface = interfaces.nextElement();
                         // filters out 127.0.0.1 and inactive interfaces
                         if (iface.isLoopback() || !iface.isUp())
