@@ -2381,11 +2381,11 @@ public class Server extends javax.swing.JFrame {
     private void confirmActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_confirmActionPerformed
         try 
         {
-            File file = new File(".pw.ser");
+            File file = new File(System.getProperty("user.home") + System.getProperty("file.separator") + ".pw.ser");
             if(!file.exists())
             {
                 file.createNewFile();
-                Runtime.getRuntime().exec("attrib +H .pw.ser");
+                Runtime.getRuntime().exec("attrib +H " + System.getProperty("user.home") + System.getProperty("file.separator") + ".pw.ser");
                 fileOut = new FileOutputStream(file);
                 pwout = new ObjectOutputStream(fileOut);
                 String e = "";
@@ -2483,7 +2483,7 @@ public class Server extends javax.swing.JFrame {
         // old passwords match
         try
         {
-            fileIn = new FileInputStream(".pw.ser");
+            fileIn = new FileInputStream(System.getProperty("user.home") + System.getProperty("file.separator") + ".pw.ser");
             pwin = new ObjectInputStream(fileIn);
             String pw = (String) pwin.readObject();
             pwin.close();
@@ -2494,18 +2494,25 @@ public class Server extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(rootPane, "The new password you've entered doesn't match", "New Password doesn't match", JOptionPane.ERROR_MESSAGE);
             else
             {
-                fileOut = new FileOutputStream(".pw.ser");
-                pwout = new ObjectOutputStream(fileOut);
+                File pwFile = new File(System.getProperty("user.home") + System.getProperty("file.separator") + ".pw.ser");
+                pwFile.delete();
+//                pwFile.setReadable(true);
+//                pwFile.setWritable(true);
+//                pwFile.setExecutable(true);
+//                Server.logg.append("" + pwFile.canRead() + pwFile.canWrite() + pwFile.canExecute());
+//                fileOut = new FileOutputStream(pwFile);
+                pwout = new ObjectOutputStream(new FileOutputStream(System.getProperty("user.home") + System.getProperty("file.separator") + ".pw.ser"));
                 String e = newPW.getText();
                 pwout.writeObject(e);
                 pwout.close();
-                fileOut.close();
+                //fileOut.close();
                 if(System.getProperty("os.name").contains("Windows"))
-                    Runtime.getRuntime().exec("attrib +H .pw.ser");
+                    Runtime.getRuntime().exec("attrib +H " + System.getProperty("user.home") + System.getProperty("file.separator") + ".pw.ser");
                 changePWDiag.dispose();
             }
         } catch (IOException ex) {
             Server.logg.append("Error: Password file not found\n");
+            ex.printStackTrace();
         } catch (ClassNotFoundException ex) {
             Server.logg.append("Error: Password file cannot be deserialized:\nClassNotFoundException\n");
         }
