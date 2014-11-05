@@ -944,7 +944,8 @@ public class Display extends javax.swing.JFrame {
     }//GEN-LAST:event_ConnectToServerBTActionPerformed
 
     private void ConnectNowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ConnectNowActionPerformed
-        ServerIPTextField.setText(prefs.get("SERVERIP", ""));
+        if(ServerIPTextField.getText().isEmpty())
+            ServerIPTextField.setText(prefs.get("SERVERIP", ""));
         if(portTextField.getText().isEmpty())
             Globalvars.port = 6069;
         else
