@@ -139,7 +139,7 @@ public class Input extends javax.swing.JFrame {
                 
                 Success.setLocationRelativeTo(null);
                 Success.setVisible(true);
-                deptIT.setSelected(false);
+                deptIT.setSelected(true);
                 deptIS.setSelected(false);
                 deptCS.setSelected(false);
                 StudentNumber.setText(null);
@@ -179,10 +179,7 @@ public class Input extends javax.swing.JFrame {
         StudentNumber = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
         Send = new javax.swing.JButton();
-        deptIT = new javax.swing.JRadioButton();
         clear = new javax.swing.JButton();
-        deptCS = new javax.swing.JRadioButton();
-        deptIS = new javax.swing.JRadioButton();
         jLabel7 = new javax.swing.JLabel();
         concern = new javax.swing.JComboBox();
         jPanel1 = new javax.swing.JPanel();
@@ -198,6 +195,9 @@ public class Input extends javax.swing.JFrame {
         C = new javax.swing.JButton();
         b0 = new javax.swing.JButton();
         backspace = new javax.swing.JButton();
+        deptIT = new javax.swing.JRadioButton();
+        deptCS = new javax.swing.JRadioButton();
+        deptIS = new javax.swing.JRadioButton();
 
         connectToServer.setTitle("Connect to Server");
         connectToServer.setMinimumSize(new java.awt.Dimension(270, 165));
@@ -370,7 +370,7 @@ public class Input extends javax.swing.JFrame {
         });
 
         jLabel3.setFont(new java.awt.Font("Lucida Grande", 0, 18)); // NOI18N
-        jLabel3.setText("Enter your Student Number");
+        jLabel3.setText("Enter your Surname");
 
         Send.setFont(new java.awt.Font("Lucida Grande", 1, 13)); // NOI18N
         Send.setText("Enter");
@@ -382,41 +382,12 @@ public class Input extends javax.swing.JFrame {
             }
         });
 
-        deptIT.setForeground(new java.awt.Color(0, 153, 0));
-        deptIT.setText("Information Technology");
-        deptIT.setEnabled(false);
-        deptIT.setName("deptIT"); // NOI18N
-        deptIT.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                deptITActionPerformed(evt);
-            }
-        });
-
         clear.setText("Clear");
         clear.setEnabled(false);
         clear.setPreferredSize(new java.awt.Dimension(75, 30));
         clear.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 clearActionPerformed(evt);
-            }
-        });
-
-        deptCS.setForeground(new java.awt.Color(0, 51, 204));
-        deptCS.setText("Computer Science");
-        deptCS.setEnabled(false);
-        deptCS.setName("dept"); // NOI18N
-        deptCS.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                deptCSActionPerformed(evt);
-            }
-        });
-
-        deptIS.setForeground(new java.awt.Color(255, 102, 0));
-        deptIS.setText("Information Systems");
-        deptIS.setEnabled(false);
-        deptIS.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                deptISActionPerformed(evt);
             }
         });
 
@@ -546,69 +517,87 @@ public class Input extends javax.swing.JFrame {
         });
         jPanel1.add(backspace);
 
+        deptIT.setForeground(new java.awt.Color(0, 153, 0));
+        deptIT.setText("Information Technology");
+        deptIT.setEnabled(false);
+        deptIT.setName("deptIT"); // NOI18N
+        deptIT.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                deptITActionPerformed(evt);
+            }
+        });
+        jPanel1.add(deptIT);
+
+        deptCS.setForeground(new java.awt.Color(0, 51, 204));
+        deptCS.setText("Computer Science");
+        deptCS.setEnabled(false);
+        deptCS.setName("dept"); // NOI18N
+        deptCS.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                deptCSActionPerformed(evt);
+            }
+        });
+        jPanel1.add(deptCS);
+
+        deptIS.setForeground(new java.awt.Color(255, 102, 0));
+        deptIS.setText("Information Systems");
+        deptIS.setEnabled(false);
+        deptIS.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                deptISActionPerformed(evt);
+            }
+        });
+        jPanel1.add(deptIS);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                            .addGap(34, 34, 34)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(jLabel7)
+                                .addComponent(StudentNumber, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(ConnectToServerBT)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(Send, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(clear, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                        .addGroup(layout.createSequentialGroup()
+                            .addGap(52, 52, 52)
+                            .addComponent(concern, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(24, 24, 24)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jLabel7)
-                                        .addComponent(StudentNumber, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGroup(layout.createSequentialGroup()
-                                            .addGap(21, 21, 21)
-                                            .addComponent(concern, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(deptIS)
-                                        .addComponent(deptCS)
-                                        .addComponent(deptIT)
-                                        .addGroup(layout.createSequentialGroup()
-                                            .addComponent(Send, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addGap(18, 18, 18)
-                                            .addComponent(clear, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(10, 10, 10)
-                                .addComponent(jLabel3)))
-                        .addGap(48, 48, 48)
-                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 253, Short.MAX_VALUE))
-                    .addComponent(ConnectToServerBT))
-                .addContainerGap())
+                        .addGap(20, 20, 20)
+                        .addComponent(jLabel3)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
+                .addComponent(jLabel3)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(StudentNumber, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jLabel7)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(concern, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel3)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(StudentNumber, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(deptIT)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(deptCS)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(deptIS)
-                        .addGap(31, 31, 31)
-                        .addComponent(jLabel7)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(concern, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(clear, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(Send, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 28, Short.MAX_VALUE)
-                        .addComponent(ConnectToServerBT)
-                        .addContainerGap())
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 312, Short.MAX_VALUE)
-                        .addGap(103, 103, 103))))
+                    .addComponent(clear, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(Send, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(ConnectToServerBT))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -698,12 +687,6 @@ public class Input extends javax.swing.JFrame {
         SendActionPerformed(evt);
     }//GEN-LAST:event_StudentNumberActionPerformed
 
-    private void deptITActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deptITActionPerformed
-        deptIT.setSelected(true);
-        deptCS.setSelected(false);
-        deptIS.setSelected(false);
-    }//GEN-LAST:event_deptITActionPerformed
-
     private void SendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SendActionPerformed
         String sent;
 /*            if(department.getSelectedItem().equals("Information Technology"))
@@ -724,23 +707,9 @@ public class Input extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(rootPane, student + " is not a valid student number.", "Invalid Student Number", JOptionPane.WARNING_MESSAGE);
             else
             {
-                if(deptIT.isSelected())
-                {
                     sent = "IT/" + StudentNumber.getText() + "/" + concern.getSelectedItem();
                     sendToServer(sent);
-                }
-                else if(deptIS.isSelected())
-                {
-                    sent = "IS/" + StudentNumber.getText() + "/" + concern.getSelectedItem();
-                    sendToServer(sent);
-                }
-                else if(deptCS.isSelected())
-                {
-                    sent = "CS/" + StudentNumber.getText() + "/" + concern.getSelectedItem();
-                    sendToServer(sent);
-                }
-                else
-                    JOptionPane.showMessageDialog(rootPane, "Please select a department", "No Department Selected", JOptionPane.INFORMATION_MESSAGE);
+                
             }
         }
         catch (NumberFormatException nfe)
@@ -763,24 +732,11 @@ public class Input extends javax.swing.JFrame {
 
     private void clearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearActionPerformed
         StudentNumber.setText("");
-        deptIT.setSelected(false);
+        deptIT.setSelected(true);
         deptIS.setSelected(false);
         deptCS.setSelected(false);
         concern.setSelectedIndex(0);
     }//GEN-LAST:event_clearActionPerformed
-
-    private void deptCSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deptCSActionPerformed
-        deptCS.setSelected(true);
-        deptIS.setSelected(false);
-        deptIT.setSelected(false);
-    }//GEN-LAST:event_deptCSActionPerformed
-
-    private void deptISActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deptISActionPerformed
-        // TODO add your handling code here:
-        deptCS.setSelected(false);
-        deptIS.setSelected(true);
-        deptIT.setSelected(false);
-    }//GEN-LAST:event_deptISActionPerformed
 
     private void b1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b1ActionPerformed
         StudentNumber.setText(StudentNumber.getText() + 1);
@@ -841,6 +797,25 @@ public class Input extends javax.swing.JFrame {
         }
         Success.dispose();
     }//GEN-LAST:event_cancelActionPerformed
+
+    private void deptISActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deptISActionPerformed
+        // TODO add your handling code here:
+        deptCS.setSelected(false);
+        deptIS.setSelected(false);
+        deptIT.setSelected(true);
+    }//GEN-LAST:event_deptISActionPerformed
+
+    private void deptCSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deptCSActionPerformed
+        deptCS.setSelected(false);
+        deptIS.setSelected(false);
+        deptIT.setSelected(true);
+    }//GEN-LAST:event_deptCSActionPerformed
+
+    private void deptITActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deptITActionPerformed
+        deptIT.setSelected(true);
+        deptCS.setSelected(false);
+        deptIS.setSelected(false);
+    }//GEN-LAST:event_deptITActionPerformed
 
     /**
      * @param args the command line arguments

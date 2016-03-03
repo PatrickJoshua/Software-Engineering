@@ -14,6 +14,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.BindException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.ServerSocket;
@@ -29,12 +30,12 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import javax.swing.JOptionPane;
 import javax.swing.JSpinner;
-import javax.swing.text.DefaultCaret;
 import javax.swing.UIManager;
+import javax.swing.text.DefaultCaret;
+
 import net.proteanit.sql.DbUtils;
 
 /**
@@ -46,15 +47,6 @@ class Global
      public static boolean nextCommand=false;
      public static String toDisplay;
 
-     public static boolean newCSStudent=false;
-     public static String toCS;
-     public static boolean newCSStudentDisp=false;
-     public static int cslength=0;
-
-     public static boolean newISStudent=false;
-     public static String toIS;
-     public static boolean newISStudentDisp=false;
-     public static int islength=0;
 
      public static boolean newITStudent=false;
      public static String toIT;
@@ -71,30 +63,6 @@ class Global
      public static String itStudentPending;
      public static String itConcernPending;
      public static boolean pendingIT = false;
-     public static String isStudentPending;
-     public static String isConcernPending;
-     public static boolean pendingIS = false;
-     public static String csStudentPending;
-     public static String csConcernPending;
-     public static boolean pendingCS = false;
-
-     public static int getCSlength() throws FileNotFoundException, IOException
-     {
-         BufferedReader br = new BufferedReader(new FileReader(ServerTest.csqueue));
-         String current;
-         for(cslength=0;(current = br.readLine())!=null;cslength++);
-         br.close();
-         return cslength+1;
-     }
-
-     public static int getISlength() throws FileNotFoundException, IOException
-     {
-         BufferedReader br = new BufferedReader(new FileReader(ServerTest.isqueue));
-         String current;
-         for(islength=0;(current = br.readLine())!=null;islength++);
-         br.close();
-         return islength+1;
-     }
 
      public static int getITlength() throws FileNotFoundException, IOException
      {
@@ -178,17 +146,11 @@ class ServerTest extends Thread
 {
    private ServerSocket serverSocket;
    public static File queue = new File("QueueIT.txt");
-   public static File csqueue = new File("QueueCS.txt");
-   public static File isqueue = new File("QueueIS.txt");
    static Date date = new Date();
    static DateFormat dateFormat = new SimpleDateFormat("yy-MM-dd");
    public static File folder = new File("Records");
    public static File itFolder = new File("Records/IT");
-   public static File isFolder = new File("Records/IS");
-   public static File csFolder = new File("Records/CS");
    public static File itQueueRecord = new File("Records/IT/IT_" + dateFormat.format(date) + ".csv");
-   public static File csQueueRecord = new File("Records/CS/CS_" + dateFormat.format(date) + ".csv");
-   public static File isQueueRecord = new File("Records/IS/IS_" + dateFormat.format(date) + ".csv");
    Connection con = null;
 
    public ServerTest(int port, Connection conn) throws IOException
@@ -198,19 +160,16 @@ class ServerTest extends Thread
       con = conn;
    }
 
-   public boolean scanForDuplicate(String department, String studNum)
+   @SuppressWarnings("finally")
+public boolean scanForDuplicate(String department, String studNum)
    {
        boolean duplicate = false;
        String txt;
-       BufferedReader br;
+       BufferedReader br = null;
        try
        {
            if(department.equalsIgnoreCase("IT"))
                br = new BufferedReader(new FileReader(queue));
-           else if(department.equalsIgnoreCase("CS"))
-               br = new BufferedReader(new FileReader(csqueue));
-           else
-               br = new BufferedReader(new FileReader(isqueue));
 
            while((txt = br.readLine()) != null)
            {
@@ -241,20 +200,17 @@ class ServerTest extends Thread
        }
    }
 
-   public boolean maxLimiter(String department, String studentNumber)
+   @SuppressWarnings("finally")
+public boolean maxLimiter(String department, String studentNumber)
    {
        boolean abuse = false;
        String txt;
-       BufferedReader br;
+       BufferedReader br = null;
        int count = 0;
        try
        {
            if(department.equalsIgnoreCase("IT"))
                br = new BufferedReader(new FileReader(itQueueRecord));
-           else if(department.equalsIgnoreCase("CS"))
-               br = new BufferedReader(new FileReader(csQueueRecord));
-           else
-               br = new BufferedReader(new FileReader(isQueueRecord));
            while((txt = br.readLine()) != null)
            {
                if(txt.charAt(7) == ',')
@@ -316,6 +272,7 @@ class ServerTest extends Thread
                 Global.itQueueListData[i] = currentLine.substring(0, 10);
             Server.itUpcomingList.setListData(Global.itQueueListData);
             Server.itQueueList.setListData(Global.itQueueListData);
+            br.close();
         }
         catch (IOException ioe)
         {
@@ -377,34 +334,6 @@ class ServerTest extends Thread
                                     Global.newITStudentDisp = true;
                                 }
                             }
-                            else if(department.equalsIgnoreCase("CS"))
-                            {
-                                bw = new BufferedWriter(new FileWriter(csqueue, true));
-                                //recordWriter = new BufferedWriter(new FileWriter(csQueueRecord,true));
-                                out.writeUTF(Global.getCSlength() + "");
-                                if(in.readUTF().equalsIgnoreCase("cancel"))
-                                    canceled = true;
-                                else
-                                {
-                                    Global.toCS = studentNumber;
-                                    Global.newCSStudent = true;
-                                    Global.newCSStudentDisp = true;
-                                }
-                            }
-                            else if(department.equalsIgnoreCase("IS"))
-                            {
-                                bw = new BufferedWriter(new FileWriter(isqueue, true));
-                                //recordWriter = new BufferedWriter(new FileWriter(isQueueRecord,true));
-                                out.writeUTF(Global.getISlength() + "");
-                                if(in.readUTF().equalsIgnoreCase("cancel"))
-                                    canceled = true;
-                                else
-                                {
-                                    Global.toIS = studentNumber;
-                                    Global.newISStudent = true;
-                                    Global.newISStudentDisp = true;
-                                }
-                            }
                             else
                             {
                                 Server.logg.append("Client entered an invalid department: " + department + "\n");
@@ -436,18 +365,6 @@ class ServerTest extends Thread
                     if(!deleted)
                         Server.logg.append("Error deleting current queue database.\n");
                 }
-                if(csqueue.exists())     //delete csqueue.txt if it exist
-                {
-                    boolean deleted = csqueue.delete();
-                    if(!deleted)
-                        Server.logg.append("Error deleting current queue database.\n");
-                }
-                if(isqueue.exists())     //delete isqueue.txt if it exist
-                {
-                    boolean deleted = isqueue.delete();
-                    if(!deleted)
-                        Server.logg.append("Error deleting current queue database.\n");
-                }
                 server.close();
                 Server.logg.append("Client at " + server.getRemoteSocketAddress() + " disconnected.\n");
             }
@@ -472,332 +389,6 @@ class ServerTest extends Thread
                          }
                         Global.nextCommand=false;
                         Global.toDisplay=null;
-                    }
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException ex) {
-                        Server.logg.append("Thread interrupted.\n");
-                    }
-                }
-            }
-            else if(identity.equals("CS"))
-            {
-                csqueue.createNewFile();
-                Server.csCon.setText("Online - " + server.getRemoteSocketAddress());
-                Server.csCon.setForeground(Color.green);
-                Server.logg.append("CS Controller at " + server.getRemoteSocketAddress() + " successfully connected.\n");
-                while(true)
-                {
-                    String received = in.readUTF();
-                    if(received.equalsIgnoreCase("CallAgain"))
-                    {
-                        Global.toDisplay="callCSAgain";
-                        Global.nextCommand=true;
-                    }
-                    else
-                    {
-                        if(Global.pendingCS)
-                        {
-                            Date date = new Date();
-                            DateFormat df = new SimpleDateFormat("HH:mm:ss");
-                            BufferedWriter br = new BufferedWriter(new FileWriter(csQueueRecord, true));
-                            br.write(df.format(date) + "," + Global.csStudentPending + "," + Global.csConcernPending + "," + received);
-                            br.newLine();
-                            br.close();
-                            //write to database
-                            if(con != null) {
-                                try {
-                                    PreparedStatement ps = con.prepareStatement("insert into HISTORY values (" + Integer.parseInt(Global.csStudentPending) + ",'CS','" + Global.csConcernPending + "','" + received + "',?,?)");
-                                    ps.setDate(1, new java.sql.Date(new java.util.Date().getTime()));
-                                    ps.setTime(2, new java.sql.Time(new java.util.Date().getTime()));
-                                    ps.executeUpdate();
-                                    ps.close();
-                                } catch (SQLException ex) {
-                                    Server.logg.append("[CS]Database error. " + ex.getMessage());
-                                }
-                            }
-                        }
-                        BufferedReader br = new BufferedReader(new FileReader(csqueue));
-                        String getFromFile, upcoming;
-                        getFromFile = br.readLine();
-                        if(getFromFile == null)
-                        {
-                            Server.logg.append("[CS Request] Queue empty\n");
-                            out.writeUTF("None");
-                            out.writeUTF("");
-                            out.writeUTF("");
-                            Global.toDisplay="CSNone";
-                            Global.nextCommand=true;
-                            Global.pendingCS = false;
-                            br.close();
-                            br = null;
-                        }
-                        else
-                        {
-                            Global.toDisplay = identity.concat(getFromFile.substring(0, 10));
-                            Global.nextCommand=true;
-                            out.writeUTF(getFromFile.substring(0, 10));
-                            Global.csStudentPending = getFromFile.substring(0, 10);
-                            Server.logg.append("CS Now Serving " + getFromFile.substring(0,10) + "\n");
-                            if((upcoming = br.readLine()) != null)  //output to display client
-                                out.writeUTF("Next: " + upcoming.substring(0, 10));
-                            else
-                                out.writeUTF("");
-                            out.writeUTF("Concern: " + getFromFile.substring(11));
-                            Global.csConcernPending = getFromFile.substring(11);
-                            Global.pendingCS = true;
-                            br.close();
-                            br = null;
-                            //if(Global.cslength>0)
-                            //    Global.cslength--;
-
-                            //start of file trimming
-                            File temp = new File("temp.txt");
-
-                            BufferedReader reader = new BufferedReader(new FileReader(csqueue));
-                            BufferedWriter writer = new BufferedWriter(new FileWriter(temp,true));
-
-                            String currentLine;
-                            boolean first=true;
-                            while((currentLine = reader.readLine()) != null)
-                            {
-                                if(!first)
-                                {
-                                    writer.append(currentLine);
-                                    writer.newLine();
-                                }
-                                else
-                                    first=false;
-                            }
-                            writer.flush();
-                            writer.close();
-                            writer = null;
-                            reader.close();
-                            reader = null;
-                            
-                            System.gc();
-
-                            if(!csqueue.canWrite() || !temp.canWrite())
-                            {
-                                Server.logg.append("Access Denied: Can't modify the Queue Database. Attempting to gain permission...\n");
-                                if(!csqueue.setWritable(true) || !temp.setWritable(true))
-                                    Server.logg.append("Error gaining write access to the file.\n");
-                                else
-                                    Server.logg.append("Permission granted.\n");
-                            }
-                            else
-                            {
-                                if(!csqueue.delete())
-                                Server.logg.append("Cannot delete untrimmed queue file\n");
-                                boolean successful = temp.renameTo(csqueue);
-                                if(!successful)
-                                    //Server.logg.append("Now serving " + getFromFile);
-                                {
-                                    Server.logg.append("Error dequeuing " + getFromFile + "\n");
-                                }
-                            }
-                        }
-                    }
-                    try {
-                        Thread.sleep(5000);
-                    } catch (InterruptedException ex) {
-                        Server.logg.append("Thread interrupted.\n");
-                    }
-                }
-            }
-            else if(identity.equals("CSreceiver"))
-            {
-                Server.csreceiverCon.setText("Online - " + server.getRemoteSocketAddress());
-                Server.csreceiverCon.setForeground(Color.green);
-                Server.logg.append("CS Upcoming Receiver at " + server.getRemoteSocketAddress() + " successfully connected.\n");
-                while(true)
-                {
-                    if(Global.newCSStudent)
-                    {
-                        out.writeUTF(Global.toCS);
-                        Global.newCSStudent=false;
-                    }
-                    try {
-                        Thread.sleep(5000);
-                    } catch (InterruptedException ex) {
-                        Server.logg.append("Thread interrupted.\n");
-                    }
-                }
-            }
-            else if(identity.equals("dispCSreceiver"))
-            {
-                Server.displaycsCon.setText("Online - " + server.getRemoteSocketAddress());
-                Server.displaycsCon.setForeground(Color.green);
-                Server.logg.append("Display CS Upcoming Receiver at " + server.getRemoteSocketAddress() + " successfully connected.\n");
-                while(true)
-                {
-                    if(Global.newCSStudentDisp)
-                    {
-                        out.writeUTF(Global.toCS);
-                        Global.newCSStudentDisp=false;
-                    }
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException ex) {
-                        Server.logg.append("Thread interrupted.\n");
-                    }
-                }
-            }
-            else if(identity.equals("IS"))
-            {
-                isqueue.createNewFile();
-                Server.isCon.setText("Online - " + server.getRemoteSocketAddress());
-                Server.isCon.setForeground(Color.green);
-                Server.logg.append("IS Controller at " + server.getRemoteSocketAddress() + " successfully connected.\n");
-                while(true)
-                {
-                    String received = in.readUTF();
-                    if(received.equalsIgnoreCase("CallAgain"))
-                    {
-                        Global.toDisplay="callISAgain";
-                        Global.nextCommand=true;
-                    }
-                    else
-                    {
-                        if(Global.pendingIS)
-                        {
-                            Date date = new Date();
-                            DateFormat df = new SimpleDateFormat("HH:mm:ss");
-                            BufferedWriter br = new BufferedWriter(new FileWriter(isQueueRecord, true));
-                            br.write(df.format(date) + "," + Global.isStudentPending + "," + Global.isConcernPending + "," + received);
-                            br.newLine();
-                            br.close();
-                            //write to database
-                            if(con != null) {
-                                try {
-                                    PreparedStatement ps = con.prepareStatement("insert into HISTORY values (" + Integer.parseInt(Global.isStudentPending) + ",'IS','" + Global.isConcernPending + "','" + received + "',?,?)");
-                                    ps.setDate(1, new java.sql.Date(new java.util.Date().getTime()));
-                                    ps.setTime(2, new java.sql.Time(new java.util.Date().getTime()));
-                                    ps.executeUpdate();
-                                    ps.close();
-                                } catch (SQLException ex) {
-                                    Server.logg.append("[IS]Database error. " + ex.getMessage());
-                                }
-                            }
-                        }
-                        BufferedReader br = new BufferedReader(new FileReader(isqueue));
-                        String getFromFile, upcoming;
-                        getFromFile = br.readLine();
-                        if(getFromFile == null)
-                        {
-                            Server.logg.append("[IS Request] Queue empty\n");
-                            out.writeUTF("None");
-                            out.writeUTF("");
-                            out.writeUTF("");
-                            Global.toDisplay="ISNone";
-                            Global.nextCommand=true;
-                            Global.pendingIS = false;
-                            br.close();
-                            br = null;
-                        }
-                        else
-                        {
-                            Global.toDisplay = identity.concat(getFromFile.substring(0, 10));
-                            Global.nextCommand=true;
-                            out.writeUTF(getFromFile.substring(0, 10));
-                            Server.logg.append("IS Now Serving " + getFromFile.substring(0,10) + "\n");
-                            Global.isStudentPending = getFromFile.substring(0, 10);
-                            if((upcoming = br.readLine()) != null)  //output to display client
-                                out.writeUTF("Next: " + upcoming.substring(0, 10));
-                            else
-                                out.writeUTF("");
-                            out.writeUTF("Concern: " + getFromFile.substring(11));
-                            Global.isConcernPending = getFromFile.substring(11);
-                            Global.pendingIS = true;
-                            br.close();
-                            br = null;
-                            //if(Global.cslength>0)
-                            //    Global.cslength--;
-
-                            //start of file trimming
-                            File temp = new File("temp.txt");
-
-                            BufferedReader reader = new BufferedReader(new FileReader(isqueue));
-                            BufferedWriter writer = new BufferedWriter(new FileWriter(temp,true));
-
-                            String currentLine;
-                            boolean first=true;
-                            while((currentLine = reader.readLine()) != null)
-                            {
-                                if(!first)
-                                {
-                                    writer.append(currentLine);
-                                    writer.newLine();
-                                }
-                                else
-                                    first=false;
-                            }
-                            writer.flush();
-                            writer.close();
-                            writer = null;
-                            reader.close();
-                            reader = null;
-                            
-                            System.gc();
-
-                            if(!isqueue.canWrite() || !temp.canWrite())
-                            {
-                                Server.logg.append("Access Denied: Can't modify the Queue Database. Attempting to gain permission...\n");
-                                if(!isqueue.setWritable(true) || !temp.setWritable(true))
-                                    Server.logg.append("Error gaining write access to the file.\n");
-                                else
-                                    Server.logg.append("Permission granted.\n");
-                            }
-                            else
-                            {
-                                if(!isqueue.delete())
-                                    Server.logg.append("Cannot delete untrimmed queue file\n");
-                                boolean successful = temp.renameTo(isqueue);
-                                if(!successful)
-                                    //Server.logg.append("Now serving " + getFromFile);
-                                {
-                                    Server.logg.append("Error dequeuing " + getFromFile + "\n");
-                                }
-                            }
-                        }
-                    }
-                    try {
-                        Thread.sleep(5000);
-                    } catch (InterruptedException ex) {
-                        Server.logg.append("Thread interrupted.\n");
-                    }
-                }
-            }
-            else if(identity.equals("ISreceiver"))
-            {
-                Server.isreceiverCon.setText("Online - " + server.getRemoteSocketAddress());
-                Server.isreceiverCon.setForeground(Color.green);
-                Server.logg.append("IS Upcoming Receiver at " + server.getRemoteSocketAddress() + " successfully connected.\n");
-                while(true)
-                {
-                    if(Global.newISStudent)
-                    {
-                        out.writeUTF(Global.toIS);
-                        Global.newISStudent=false;
-                    }
-                    try {
-                        Thread.sleep(5000);
-                    } catch (InterruptedException ex) {
-                        Server.logg.append("Thread interrupted.\n");
-                    }
-                }
-            }
-            else if(identity.equals("dispISreceiver"))
-            {
-                Server.displayisCon.setText("Online - " + server.getRemoteSocketAddress());
-                Server.displayisCon.setForeground(Color.green);
-                Server.logg.append("Display IS Upcoming Receiver at " + server.getRemoteSocketAddress() + " successfully connected.\n");
-                while(true)
-                {
-                    if(Global.newISStudentDisp)
-                    {
-                        out.writeUTF(Global.toIS);
-                        Global.newISStudentDisp=false;
                     }
                     try {
                         Thread.sleep(1000);
@@ -844,10 +435,6 @@ class ServerTest extends Thread
                  Server.logg.append("Input Kiosk terminated the connection.\n");
              else if(identity.equalsIgnoreCase("display"))
                  Server.logg.append("Display unit terminated the connection.\n");
-             else if(identity.equalsIgnoreCase("CS"))
-                 Server.logg.append("CS Controller terminated the connection.\n");
-             else if(identity.equalsIgnoreCase("IS"))
-                 Server.logg.append("IS Controller terminated the connection.\n");
              else if(identity.equalsIgnoreCase("IT"))
                  Server.logg.append("IT Controller terminated the connection.\n");
              else
@@ -1015,12 +602,6 @@ public class Server extends javax.swing.JFrame {
                   if(!ServerTest.itFolder.exists())
                       if(!ServerTest.itFolder.mkdir())
                           Server.logg.append("Cannot create IT folder on the Records directory\n");
-                  if(!ServerTest.isFolder.exists())
-                      if(!ServerTest.isFolder.mkdir())
-                          Server.logg.append("Cannot create IS folder on the Records directory\n");
-                  if(!ServerTest.csFolder.exists())
-                      if(!ServerTest.csFolder.mkdir())
-                          Server.logg.append("Cannot create CS folder on the Records directory\n");
               }
               catch (SecurityException se)
               {
@@ -1036,30 +617,6 @@ public class Server extends javax.swing.JFrame {
                     else
                     {
                         BufferedWriter br = new BufferedWriter(new FileWriter(ServerTest.itQueueRecord));
-                        br.write("Time,Student Number,Concern,Remarks");
-                        br.newLine();
-                        br.close();
-                    }
-                }
-                if(!ServerTest.isQueueRecord.exists())
-                {
-                    if(!ServerTest.isQueueRecord.createNewFile())
-                        Server.logg.append("Cannot create IS Queue Record");
-                    else
-                    {
-                        BufferedWriter br = new BufferedWriter(new FileWriter(ServerTest.isQueueRecord));
-                        br.write("Time,Student Number,Concern,Remarks");
-                        br.newLine();
-                        br.close();
-                    }
-                }
-                if(!ServerTest.csQueueRecord.exists())
-                {
-                    if(!ServerTest.csQueueRecord.createNewFile())
-                        Server.logg.append("Cannot create CS Queue Record");
-                    else
-                    {
-                        BufferedWriter br = new BufferedWriter(new FileWriter(ServerTest.csQueueRecord));
                         br.write("Time,Student Number,Concern,Remarks");
                         br.newLine();
                         br.close();
@@ -1230,17 +787,9 @@ public class Server extends javax.swing.JFrame {
         jMenuItem5 = new javax.swing.JMenuItem();
         jSeparator2 = new javax.swing.JPopupMenu.Separator();
         viewITrecord = new javax.swing.JMenuItem();
-        viewCSrecord = new javax.swing.JMenuItem();
-        viewISrecord = new javax.swing.JMenuItem();
         jSeparator3 = new javax.swing.JPopupMenu.Separator();
-        viewAllMenu = new javax.swing.JMenu();
-        viewAll = new javax.swing.JMenuItem();
-        jSeparator4 = new javax.swing.JPopupMenu.Separator();
         allIT = new javax.swing.JMenuItem();
-        allCS = new javax.swing.JMenuItem();
-        allIS = new javax.swing.JMenuItem();
         jSeparator5 = new javax.swing.JPopupMenu.Separator();
-        viewDB = new javax.swing.JMenuItem();
         jMenu3 = new javax.swing.JMenu();
         jMenuItem4 = new javax.swing.JMenuItem();
 
@@ -1858,30 +1407,30 @@ public class Server extends javax.swing.JFrame {
 
         jLabel34.setText("CS Controller");
 
-        jSpinner1.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(6066), null, null, Integer.valueOf(1)));
+        jSpinner1.setModel(new javax.swing.SpinnerNumberModel(6066, null, null, 1));
 
         jLabel35.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
         jLabel35.setText("Port:");
 
-        jSpinner2.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(6067), null, null, Integer.valueOf(1)));
+        jSpinner2.setModel(new javax.swing.SpinnerNumberModel(6067, null, null, 1));
 
-        jSpinner3.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(6068), null, null, Integer.valueOf(1)));
+        jSpinner3.setModel(new javax.swing.SpinnerNumberModel(6068, null, null, 1));
 
-        jSpinner5.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(6069), null, null, Integer.valueOf(1)));
+        jSpinner5.setModel(new javax.swing.SpinnerNumberModel(6069, null, null, 1));
 
-        jSpinner6.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(6070), null, null, Integer.valueOf(1)));
+        jSpinner6.setModel(new javax.swing.SpinnerNumberModel(6070, null, null, 1));
 
         jLabel36.setText("CS Controller Receiver");
 
-        jSpinner7.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(6072), null, null, Integer.valueOf(1)));
+        jSpinner7.setModel(new javax.swing.SpinnerNumberModel(6072, null, null, 1));
 
-        jSpinner8.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(6073), null, null, Integer.valueOf(1)));
+        jSpinner8.setModel(new javax.swing.SpinnerNumberModel(6073, null, null, 1));
 
-        jSpinner9.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(6071), null, null, Integer.valueOf(1)));
+        jSpinner9.setModel(new javax.swing.SpinnerNumberModel(6071, null, null, 1));
 
-        jSpinner10.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(6074), null, null, Integer.valueOf(1)));
+        jSpinner10.setModel(new javax.swing.SpinnerNumberModel(6074, null, null, 1));
 
-        jSpinner11.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(6075), null, null, Integer.valueOf(1)));
+        jSpinner11.setModel(new javax.swing.SpinnerNumberModel(6075, null, null, 1));
 
         jLabel37.setText("Display Main");
 
@@ -2275,34 +1824,7 @@ public class Server extends javax.swing.JFrame {
             }
         });
         viewISfile.add(viewITrecord);
-
-        viewCSrecord.setText("View Generated C.S. Queue Record");
-        viewCSrecord.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                viewCSrecordActionPerformed(evt);
-            }
-        });
-        viewISfile.add(viewCSrecord);
-
-        viewISrecord.setText("View Generated I.S. Queue Record");
-        viewISrecord.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                viewISrecordActionPerformed(evt);
-            }
-        });
-        viewISfile.add(viewISrecord);
         viewISfile.add(jSeparator3);
-
-        viewAllMenu.setText("Open in File Browser");
-
-        viewAll.setText("View All Records Directory");
-        viewAll.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                viewAllActionPerformed(evt);
-            }
-        });
-        viewAllMenu.add(viewAll);
-        viewAllMenu.add(jSeparator4);
 
         allIT.setText("I.T. Records Directory");
         allIT.addActionListener(new java.awt.event.ActionListener() {
@@ -2310,34 +1832,8 @@ public class Server extends javax.swing.JFrame {
                 allITActionPerformed(evt);
             }
         });
-        viewAllMenu.add(allIT);
-
-        allCS.setText("C.S. Records Directory");
-        allCS.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                allCSActionPerformed(evt);
-            }
-        });
-        viewAllMenu.add(allCS);
-
-        allIS.setText("I.S. Records Directory");
-        allIS.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                allISActionPerformed(evt);
-            }
-        });
-        viewAllMenu.add(allIS);
-
-        viewISfile.add(viewAllMenu);
+        viewISfile.add(allIT);
         viewISfile.add(jSeparator5);
-
-        viewDB.setText("View Database");
-        viewDB.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                viewDBActionPerformed(evt);
-            }
-        });
-        viewISfile.add(viewDB);
 
         jMenuBar1.add(viewISfile);
 
@@ -2537,7 +2033,7 @@ public class Server extends javax.swing.JFrame {
     }//GEN-LAST:event_lunchActionPerformed
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-        try
+        /*try
         {
             BufferedReader csReader = new BufferedReader(new FileReader(ServerTest.csqueue));
             BufferedReader isReader = new BufferedReader(new FileReader(ServerTest.isqueue));
@@ -2560,7 +2056,7 @@ public class Server extends javax.swing.JFrame {
         catch (IOException ioe)
         {
             Server.logg.append("Failed to read queue files.");
-        }
+        }*/
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
@@ -2609,42 +2105,6 @@ public class Server extends javax.swing.JFrame {
     private void viewISfileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewISfileActionPerformed
         
     }//GEN-LAST:event_viewISfileActionPerformed
-
-    private void viewCSrecordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewCSrecordActionPerformed
-        try
-        {
-            if(Global.mac)
-                Runtime.getRuntime().exec("open Records/CS/" + ServerTest.csQueueRecord.getName());
-            else if(System.getProperty("os.name").contains("Windows"))
-                Runtime.getRuntime().exec("cmd /c Records\\CS\\" + ServerTest.csQueueRecord.getName() + "\"");
-            else if(System.getProperty("os.name").contains("Linux"))
-                Runtime.getRuntime().exec("gnome-open Records/CS/" + ServerTest.csQueueRecord.getName());
-            else
-                JOptionPane.showMessageDialog(rootPane, "You can open the file at Records\\CS\\" + ServerTest.csQueueRecord.getName(), "Unsupported Operating System", JOptionPane.ERROR_MESSAGE);
-        }
-        catch (IOException ioe)
-        {
-            JOptionPane.showMessageDialog(rootPane, "Cannot find " + ServerTest.csQueueRecord.getName() + "\n or Microsoft Excel isn't installed in your system", "File not found/Failed to launch Microsoft Excel", JOptionPane.ERROR_MESSAGE);
-        }
-    }//GEN-LAST:event_viewCSrecordActionPerformed
-
-    private void viewISrecordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewISrecordActionPerformed
-        try
-        {
-            if(Global.mac)
-                Runtime.getRuntime().exec("open Records/IS/" + ServerTest.isQueueRecord.getName());
-            else if(System.getProperty("os.name").contains("Windows"))
-                Runtime.getRuntime().exec("cmd /c Records\\IS\\" + ServerTest.isQueueRecord.getName() + "\"");
-            else if(System.getProperty("os.name").contains("Linux"))
-                Runtime.getRuntime().exec("gnome-open Records/IS/" + ServerTest.isQueueRecord.getName());
-            else
-                JOptionPane.showMessageDialog(rootPane, "You can open the file at Records\\IS\\" + ServerTest.isQueueRecord.getName(), "Unsupported Operating System", JOptionPane.ERROR_MESSAGE);
-        }
-        catch (IOException ioe)
-        {
-            JOptionPane.showMessageDialog(rootPane, "Cannot find " + ServerTest.isQueueRecord.getName() + "\n or Microsoft Excel isn't installed in your system", "File not found/Failed to launch Microsoft Excel", JOptionPane.ERROR_MESSAGE);
-        }
-    }//GEN-LAST:event_viewISrecordActionPerformed
 
     private void viewITrecordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewITrecordActionPerformed
         try
@@ -2704,24 +2164,6 @@ public class Server extends javax.swing.JFrame {
         nextBTActionPerformed(evt);
     }//GEN-LAST:event_remarksActionPerformed
 
-    private void viewAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewAllActionPerformed
-        try
-        {
-            if(Global.mac)
-                Runtime.getRuntime().exec("open Records/");
-            else if(System.getProperty("os.name").contains("Windows"))
-                Runtime.getRuntime().exec("cmd /c explorer.exe Records");
-            else if(System.getProperty("os.name").contains("Linux"))
-                Runtime.getRuntime().exec("gnome-open Records/");
-            else
-                JOptionPane.showMessageDialog(rootPane, "You can open the folder located at Records/", "Unsupported Operating System", JOptionPane.ERROR_MESSAGE);
-        }
-        catch (IOException ioe)
-        {
-            JOptionPane.showMessageDialog(rootPane, "Failed to launch file browser", "Launching Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }//GEN-LAST:event_viewAllActionPerformed
-
     private void allITActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_allITActionPerformed
         try
         {
@@ -2740,53 +2182,9 @@ public class Server extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_allITActionPerformed
 
-    private void allCSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_allCSActionPerformed
-        try
-        {
-            if(Global.mac)
-                Runtime.getRuntime().exec("open Records/CS/");
-            else if(System.getProperty("os.name").contains("Windows"))
-                Runtime.getRuntime().exec("cmd /c explorer.exe Records\\CS");
-            else if(System.getProperty("os.name").contains("Linux"))
-                Runtime.getRuntime().exec("gnome-open Records/CS/");
-            else
-                JOptionPane.showMessageDialog(rootPane, "You can open the folder located at Records/CS", "Unsupported Operating System", JOptionPane.ERROR_MESSAGE);
-        }
-        catch (IOException ioe)
-        {
-            JOptionPane.showMessageDialog(rootPane, "Failed to launch file browser", "Launching Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }//GEN-LAST:event_allCSActionPerformed
-
-    private void allISActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_allISActionPerformed
-        try
-        {
-            if(Global.mac)
-                Runtime.getRuntime().exec("open Records/IS/");
-            else if(System.getProperty("os.name").contains("Windows"))
-                Runtime.getRuntime().exec("cmd /c explorer.exe Records\\IS");
-            else if(System.getProperty("os.name").contains("Linux"))
-                Runtime.getRuntime().exec("gnome-open Records/IS/");
-            else
-                JOptionPane.showMessageDialog(rootPane, "You can open the folder located at Records/IS", "Unsupported Operating System", JOptionPane.ERROR_MESSAGE);
-        }
-        catch (IOException ioe)
-        {
-            JOptionPane.showMessageDialog(rootPane, "Failed to launch file browser", "Launching Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }//GEN-LAST:event_allISActionPerformed
-
     private void sqlBTActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sqlBTActionPerformed
         executeSQL("HISTORY");
     }//GEN-LAST:event_sqlBTActionPerformed
-
-    private void viewDBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewDBActionPerformed
-        sqlTF.setText("select * from HISTORY");
-        viewDatabase.pack();
-        viewDatabase.setLocationRelativeTo(null);
-        viewDatabase.setVisible(true);
-        executeSQL("HISTORY");
-    }//GEN-LAST:event_viewDBActionPerformed
 
     void executeSQL(String DBtable) {
         try {
@@ -2899,22 +2297,8 @@ public class Server extends javax.swing.JFrame {
                       logg.append("Connect the clients through the IP Addresses\nlisted above and the port numbers below.\n");
                      Thread inputThread = new ServerTest(port1,null);
                      inputThread.start();
-                     Thread CSControllerThread = new ServerTest(port2,con);
-                     CSControllerThread.start();
-                     Thread CSReceiverThread = new ServerTest(port3,null);
-                     CSReceiverThread.start();
                      Thread displayThread = new ServerTest(port4,null);
                      displayThread.start();
-                     Thread displayCSupcomingThread = new ServerTest(port5,null);
-                     displayCSupcomingThread.start();
-
-                     Thread ISControllerThread = new ServerTest(port6,con);
-                     ISControllerThread.start();
-                     Thread ISReceiverThread = new ServerTest(port7,null);
-                     ISReceiverThread.start();
-                     Thread displayISupcomingThread = new ServerTest(port8,null);
-                     displayISupcomingThread.start();
-
                      Thread cutoffListenerThread = new cutoff(port9);
                      cutoffListenerThread.start();
 
@@ -2922,10 +2306,13 @@ public class Server extends javax.swing.JFrame {
                      displayITupcomingThread.start();
 
                      ServerTest.updateITQueueList();
+                  } catch (BindException be) {
+                	  logg.append("ERROR: Ports are already in use. Check if another server instance is running.\n");
                   }
                   catch(Exception ee)
                   {
                       logg.append("ERROR: Unable to detect current IP Address.\n");
+                      ee.printStackTrace();
                   }
             }
         });
@@ -2937,8 +2324,6 @@ public class Server extends javax.swing.JFrame {
     private javax.swing.JDialog about;
     private javax.swing.JMenuItem adminMenu;
     private javax.swing.JDialog adminMode;
-    private javax.swing.JMenuItem allCS;
-    private javax.swing.JMenuItem allIS;
     private javax.swing.JMenuItem allIT;
     private javax.swing.JButton callAgain;
     private javax.swing.JButton cancelChangePort;
@@ -3039,7 +2424,6 @@ public class Server extends javax.swing.JFrame {
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator2;
     private javax.swing.JPopupMenu.Separator jSeparator3;
-    private javax.swing.JPopupMenu.Separator jSeparator4;
     private javax.swing.JPopupMenu.Separator jSeparator5;
     public static javax.swing.JSpinner jSpinner1;
     public static javax.swing.JSpinner jSpinner10;
@@ -3069,13 +2453,8 @@ public class Server extends javax.swing.JFrame {
     private javax.swing.JButton sqlBT;
     private javax.swing.JTextField sqlTF;
     public javax.swing.JTable table;
-    private javax.swing.JMenuItem viewAll;
-    private javax.swing.JMenu viewAllMenu;
-    private javax.swing.JMenuItem viewCSrecord;
-    private javax.swing.JMenuItem viewDB;
     public static javax.swing.JFrame viewDatabase;
     private javax.swing.JMenu viewISfile;
-    private javax.swing.JMenuItem viewISrecord;
     private javax.swing.JMenuItem viewITrecord;
     private javax.swing.JDialog viewQueue;
     // End of variables declaration//GEN-END:variables

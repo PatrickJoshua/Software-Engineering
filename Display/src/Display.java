@@ -36,39 +36,11 @@ class Globalvars
 {
     public static String ServerIP;
     public static int port;
-    public static String [] upcomingCS = new String[99];
-    public static int CSlastIndex = 0;
-    public static String [] upcomingIS = new String[99];
-    public static int ISlastIndex = 0;
     public static String [] upcomingIT = new String[99];
     public static int ITlastIndex = 0;
-    public static BufferedWriter csWrite;
-    public static BufferedWriter isWrite;
     public static BufferedWriter itWrite;
 
     public static boolean mac = false;
-
-    public static void writeCS() throws IOException
-    {
-        csWrite = new BufferedWriter(new FileWriter("CSqueue.txt"));
-        for(int i=0; i<CSlastIndex; i++)
-        {
-            csWrite.append(upcomingCS[i]);
-            csWrite.newLine();
-        }
-        csWrite.close();
-    }
-
-    public static void writeIS() throws IOException
-    {
-        isWrite = new BufferedWriter(new FileWriter("ISqueue.txt"));
-        for(int i=0; i<ISlastIndex; i++)
-        {
-            isWrite.append(upcomingIS[i]);
-            isWrite.newLine();
-        }
-        isWrite.close();
-    }
 
     public static void writeIT() throws IOException
     {
@@ -79,128 +51,6 @@ class Globalvars
             itWrite.newLine();
         }
         itWrite.close();
-    }
-}
-
-class CSReceiverThread extends Thread
-{
-    Socket receiver;
-    DataOutputStream outToServer;
-    DataInputStream inFromServer;
-
-    @Override
-    public void run()
-    {
-        try
-        {
-            //recover
-            File csQueue = new File("CSqueue.txt");
-            if(!csQueue.exists())
-                csQueue.createNewFile();
-            else
-            {
-                BufferedReader csReader = new BufferedReader(new FileReader(csQueue));
-                String currentLine;
-                int i;
-                for(i=0;(currentLine = csReader.readLine())!=null; i++)
-                    Globalvars.upcomingCS[i] = currentLine;
-                csReader.close();
-                Globalvars.CSlastIndex = i;
-                Display.CSupcoming.setListData(Globalvars.upcomingCS);
-            }
-        }
-        catch (IOException ioe)
-        {
-            JOptionPane.showMessageDialog(null, "Cannot display recovered upcoming queue (CS). Operations can still continue", "Recovery Failed", JOptionPane.INFORMATION_MESSAGE);
-        }
-
-        try
-        {
-            //start connecting to server
-            receiver = new Socket(Globalvars.ServerIP, 6070);
-            outToServer = new DataOutputStream(receiver.getOutputStream());     //client to server output stream
-            outToServer.writeUTF("dispCSreceiver");
-            inFromServer = new DataInputStream(receiver.getInputStream());       //server to client input stream
-            String received;
-            while(true)
-            {
-                received = inFromServer.readUTF();
-                Globalvars.upcomingCS[Globalvars.CSlastIndex] = received;
-                Globalvars.CSlastIndex++;
-                Display.CSupcoming.setListData(Globalvars.upcomingCS);
-                Globalvars.writeCS();
-                try {
-                    Thread.sleep(5000);
-                } catch (InterruptedException ex) {
-                    ex.printStackTrace();
-                }
-            }
-        }
-        catch (IOException ioe)
-        {
-            JOptionPane.showMessageDialog(null, "Error retreiving CS upcoming data from server.\nReal-time upcoming clients cannot be updated\nas of the moment. Basic operations can still continue.", "Retreive Failed", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-}
-
-class ISReceiverThread extends Thread
-{
-    Socket receiver;
-    DataOutputStream outToServer;
-    DataInputStream inFromServer;
-
-    @Override
-    public void run()
-    {
-        try
-        {
-            //recover
-            File isQueue = new File("ISqueue.txt");
-            if(!isQueue.exists())
-                isQueue.createNewFile();
-            else
-            {
-                BufferedReader isReader = new BufferedReader(new FileReader(isQueue));
-                String currentLine;
-                int i;
-                for(i=0;(currentLine = isReader.readLine())!=null; i++)
-                    Globalvars.upcomingIS[i] = currentLine;
-                isReader.close();
-                Globalvars.ISlastIndex = i;
-                Display.ISupcoming.setListData(Globalvars.upcomingIS);
-            }
-        }
-        catch (IOException ioe)
-        {
-            JOptionPane.showMessageDialog(null, "Cannot display recovered upcoming queue (IS). Operations can still continue", "Recovery Failed", JOptionPane.INFORMATION_MESSAGE);
-        }
-
-        try
-        {
-            //start connecting to server
-            receiver = new Socket(Globalvars.ServerIP, 6073);
-            outToServer = new DataOutputStream(receiver.getOutputStream());     //client to server output stream
-            outToServer.writeUTF("dispISreceiver");
-            inFromServer = new DataInputStream(receiver.getInputStream());       //server to client input stream
-            String received;
-            while(true)
-            {
-                received = inFromServer.readUTF();
-                Globalvars.upcomingIS[Globalvars.ISlastIndex] = received;
-                Globalvars.ISlastIndex++;
-                Display.ISupcoming.setListData(Globalvars.upcomingIS);
-                Globalvars.writeIS();
-                try {
-                    Thread.sleep(5000);
-                } catch (InterruptedException ex) {
-                    ex.printStackTrace();
-                }
-            }
-        }
-        catch (IOException ioe)
-        {
-            JOptionPane.showMessageDialog(null, "Error retreiving IS upcoming data from server.\nReal-time upcoming clients cannot be updated\nas of the moment. Basic operations can still continue.", "Retreive Failed", JOptionPane.ERROR_MESSAGE);
-        }
     }
 }
 
@@ -250,7 +100,7 @@ class ITReceiverThread extends Thread
                 Globalvars.upcomingIT[Globalvars.ITlastIndex] = received;
                 Globalvars.ITlastIndex++;
                 Display.ITupcoming.setListData(Globalvars.upcomingIT);
-                Globalvars.writeIS();
+                Globalvars.writeIT();
                 try {
                     Thread.sleep(5000);
                 } catch (InterruptedException ex) {
@@ -310,38 +160,6 @@ class Wait4Next extends Thread
                          Display.blinkIT();
                      }
                  }
-                 else if(received.equalsIgnoreCase("callISAgain"))
-                 {
-                     if(!Display.ISserving.getText().contains("None"))
-                     {
-                         AudioInputStream ais = AudioSystem.getAudioInputStream(new File("tone.wav"));
-                         Clip tone = AudioSystem.getClip();
-                         tone.open(ais);
-                         tone.start();
-                         if(Globalvars.mac)
-                         {
-                             String tts = "Now serving " + studentNumber.substring(0, 4) + " " + studentNumber.substring(4) + " on " + department.substring(0, 1) + " " + department.substring(1) + " department";
-                             Runtime.getRuntime().exec("say " + tts);
-                         }
-                         Display.blinkIS();
-                     }
-                 }
-                 else if(received.equalsIgnoreCase("callCSAgain"))
-                 {
-                     if(!Display.CSserving.getText().contains("None"))
-                     {
-                         AudioInputStream ais = AudioSystem.getAudioInputStream(new File("tone.wav"));
-                         Clip tone = AudioSystem.getClip();
-                         tone.open(ais);
-                         tone.start();
-                         if(Globalvars.mac)
-                         {
-                             String tts = "Now serving " + studentNumber.substring(0, 4) + " " + studentNumber.substring(4) + " on " + department.substring(0, 1) + " " + department.substring(1) + " department";
-                             Runtime.getRuntime().exec("say " + tts);
-                         }
-                         Display.blinkCS();
-                     }
-                 }
                  else
                  {
                      department = received.substring(0, 2);
@@ -377,48 +195,7 @@ class Wait4Next extends Thread
                          {
                              Globalvars.upcomingIT[0] = "";
                              Display.ITupcoming.setListData(Globalvars.upcomingIT);
-                             Globalvars.writeIS();
-                         }
-                     }
-                     else if(department.equalsIgnoreCase("CS"))
-                     {
-                         //mediaPlayer.play();
-                         Display.CSserving.setText(studentNumber);
-                         if(Globalvars.CSlastIndex>0)
-                         {
-                             for(int i=0;i<Globalvars.CSlastIndex;i++)
-                                Globalvars.upcomingCS[i] = Globalvars.upcomingCS[i+1];
-                             if(Globalvars.CSlastIndex!=0)
-                                 Globalvars.CSlastIndex--;
-                             Display.CSupcoming.setListData(Globalvars.upcomingCS);
-                             Globalvars.writeCS();
-                             Display.blinkCS();
-                         }
-                         else
-                         {
-                             Globalvars.upcomingCS[0] = "";
-                             Display.CSupcoming.setListData(Globalvars.upcomingCS);
-                             Globalvars.writeCS();
-                         }
-                     }
-                     else if(department.equalsIgnoreCase("IS"))
-                     {
-                         Display.ISserving.setText(studentNumber);
-                         if(Globalvars.ISlastIndex>0)
-                         {
-                             for(int i=0;i<Globalvars.ISlastIndex;i++)
-                                Globalvars.upcomingIS[i] = Globalvars.upcomingIS[i+1];
-                             if(Globalvars.ISlastIndex!=0)
-                                 Globalvars.ISlastIndex--;
-                             Display.ISupcoming.setListData(Globalvars.upcomingIS);
-                             Globalvars.writeIS();
-                             Display.blinkIS();
-                         }
-                         else
-                         {
-                             Globalvars.upcomingIS[0] = "";
-                             Display.ISupcoming.setListData(Globalvars.upcomingIS);
-                             Globalvars.writeIS();
+                             Globalvars.writeIT();
                          }
                      }
                      else
@@ -490,53 +267,6 @@ public class Display extends javax.swing.JFrame {
         }
     }
 
-    public static void blinkCS()
-    {
-        try
-        {
-            Color green = new Color(0,51,153);
-            Color blue = new Color(153,153,255);
-            CSserving.setForeground(blue);
-            Thread.sleep(1000);
-            CSserving.setForeground(green);
-            Thread.sleep(1000);
-            CSserving.setForeground(blue);
-            Thread.sleep(1000);
-            CSserving.setForeground(green);
-            Thread.sleep(1000);
-            CSserving.setForeground(blue);
-            Thread.sleep(1000);
-            CSserving.setForeground(green);
-        }
-        catch (InterruptedException ie)
-        {
-            JOptionPane.showMessageDialog(null, "CS Label cannot blink", "Interrupted Exception", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    public static void blinkIS()
-    {
-        try
-        {
-            Color green = new Color(255,102,0);
-            ISserving.setForeground(Color.ORANGE);
-            Thread.sleep(1000);
-            ISserving.setForeground(green);
-            Thread.sleep(1000);
-            ISserving.setForeground(Color.ORANGE);
-            Thread.sleep(1000);
-            ISserving.setForeground(green);
-            Thread.sleep(1000);
-            ISserving.setForeground(Color.ORANGE);
-            Thread.sleep(1000);
-            ISserving.setForeground(green);
-        }
-        catch (InterruptedException ie)
-        {
-            JOptionPane.showMessageDialog(null, "IT Label cannot blink", "Interrupted Exception", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-    
     boolean connected = false;
     public static Socket client;
     public static DataOutputStream outToServer;
@@ -979,10 +709,6 @@ public class Display extends javax.swing.JFrame {
             connectToServer.hide();
             Thread wait4nextThread = new Wait4Next();
             wait4nextThread.start();
-            Thread CSupcomingThread = new CSReceiverThread();
-            CSupcomingThread.start();
-            Thread ISupcomingThread = new ISReceiverThread();
-            ISupcomingThread.start();
             Thread ITupcomingThread = new ITReceiverThread();
             ITupcomingThread.start();
 
