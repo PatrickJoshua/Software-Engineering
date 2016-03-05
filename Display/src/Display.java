@@ -3,6 +3,7 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.DataInputStream;
@@ -19,10 +20,11 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
+
 import javax.imageio.ImageIO;
-import javax.sound.sampled.Clip;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
@@ -175,7 +177,8 @@ class Wait4Next extends Thread
                      if(!Display.ITserving.getText().contains("None"))
                      {
                          //AudioInputStream ais = AudioSystem.getAudioInputStream(new File("tone.wav"));
-                         AudioInputStream ais = AudioSystem.getAudioInputStream(Display.class.getResourceAsStream("resources/tone.wav"));
+                    	 BufferedInputStream bis = new BufferedInputStream(Display.class.getResourceAsStream("resources/tone.wav"));
+                         AudioInputStream ais = AudioSystem.getAudioInputStream(bis);
                          Clip tone = AudioSystem.getClip();
                          tone.open(ais);
                          tone.start();
@@ -194,7 +197,8 @@ class Wait4Next extends Thread
                      if(!studentNumber.equalsIgnoreCase("none"))
                      {
                          //AudioInputStream ais = AudioSystem.getAudioInputStream(new File("tone.wav"));
-                         AudioInputStream ais = AudioSystem.getAudioInputStream(Display.class.getResourceAsStream("resources/tone.wav"));
+                    	 BufferedInputStream bis = new BufferedInputStream(Display.class.getResourceAsStream("resources/tone.wav"));
+                         AudioInputStream ais = AudioSystem.getAudioInputStream(bis);
                          Clip tone = AudioSystem.getClip();
                          tone.open(ais);
                          tone.start();
@@ -252,7 +256,11 @@ class Wait4Next extends Thread
 
 public class Display extends javax.swing.JFrame {
 
-    Preferences prefs = Preferences.userRoot();
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	Preferences prefs = Preferences.userRoot();
 
     public Display() {
         initComponents();

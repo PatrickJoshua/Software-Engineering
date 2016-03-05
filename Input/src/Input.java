@@ -1,6 +1,4 @@
 
-import java.awt.Image;
-import java.awt.image.BufferedImage;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -12,8 +10,7 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
+
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 

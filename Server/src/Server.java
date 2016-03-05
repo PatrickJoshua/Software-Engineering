@@ -1,5 +1,4 @@
 
-import com.opencsv.CSVReader;
 import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -15,7 +14,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.StringReader;
 import java.net.BindException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -23,7 +21,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -477,7 +474,7 @@ public boolean maxLimiter(String department, String studentNumber)
                 Server.itNowServing.setText("None");
                 Server.nextTxt.setText("");
                 Server.itConcernTxt.setText("Concern: ");
-                JOptionPane.showMessageDialog(null, "No one is currently on queue", "Queue is Empty", JOptionPane.INFORMATION_MESSAGE);
+                //JOptionPane.showMessageDialog(null, "No one is currently on queue", "Queue is Empty", JOptionPane.INFORMATION_MESSAGE);
                 Global.toDisplay="None";
                 Global.nextCommand=true;
                 Global.pendingIT = false;
@@ -1576,9 +1573,7 @@ public class Server extends javax.swing.JFrame {
                 .addContainerGap()
                 .add(logPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 520, Short.MAX_VALUE)
-                    .add(logPanelLayout.createSequentialGroup()
-                        .add(jLabel21)
-                        .add(0, 0, 0)))
+                    .add(jLabel21))
                 .addContainerGap())
         );
         logPanelLayout.setVerticalGroup(
@@ -1599,6 +1594,7 @@ public class Server extends javax.swing.JFrame {
         itNowServingTxt.setForeground(new java.awt.Color(51, 102, 0));
         itNowServingTxt.setText("None");
 
+        itConcernTxt.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         itConcernTxt.setText("Concern: ");
 
         nextTxt.setForeground(new java.awt.Color(102, 102, 102));
@@ -1794,8 +1790,6 @@ public class Server extends javax.swing.JFrame {
                 .add(logPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
 
-        queueControlPanel.getAccessibleContext().setAccessibleName("Queue Controller");
-
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
@@ -1852,7 +1846,7 @@ public class Server extends javax.swing.JFrame {
                     jButton3.setEnabled(enabled);
                     changePW.setEnabled(enabled);
                     jButton4.setEnabled(enabled);
-                    //remarks.setEnabled(enabled);
+                    remarks.setEnabled(enabled);
                     nextBT.setEnabled(enabled);
                     callAgain.setEnabled(enabled);
                     viewISfile.setEnabled(enabled);
@@ -2036,7 +2030,7 @@ public class Server extends javax.swing.JFrame {
             jButton3.setEnabled(enabled);
             changePW.setEnabled(enabled);
             jButton4.setEnabled(enabled);
-            //remarks.setEnabled(enabled);
+            remarks.setEnabled(enabled);
             nextBT.setEnabled(enabled);
             callAgain.setEnabled(enabled);
             jMenuBar1.setEnabled(enabled);
