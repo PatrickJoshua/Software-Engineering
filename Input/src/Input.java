@@ -124,8 +124,8 @@ public class Input extends javax.swing.JFrame {
             position = inFromServer.readUTF();
             if(position.equalsIgnoreCase("duplicate"))
                 JOptionPane.showMessageDialog(rootPane, "Student Number " + StudentNumber.getText() + " has already been added to the queue", "Duplicate Detected", JOptionPane.ERROR_MESSAGE);
-            else if(position.equalsIgnoreCase("abuse"))
-                JOptionPane.showMessageDialog(rootPane, "Student Number " + StudentNumber.getText() + " has already reached its maximum limit per day", "Exceeded Maximum Transaction", JOptionPane.ERROR_MESSAGE);
+            //else if(position.equalsIgnoreCase("abuse"))
+            //    JOptionPane.showMessageDialog(rootPane, "Student Number " + StudentNumber.getText() + " has already reached its maximum limit per day", "Exceeded Maximum Transaction", JOptionPane.ERROR_MESSAGE);
             else
             {
                 if(position.equals("1"))
@@ -198,6 +198,7 @@ public class Input extends javax.swing.JFrame {
         deptIT = new javax.swing.JRadioButton();
         deptCS = new javax.swing.JRadioButton();
         deptIS = new javax.swing.JRadioButton();
+        jLabel9 = new javax.swing.JLabel();
 
         connectToServer.setTitle("Connect to Server");
         connectToServer.setMinimumSize(new java.awt.Dimension(270, 165));
@@ -370,7 +371,7 @@ public class Input extends javax.swing.JFrame {
         });
 
         jLabel3.setFont(new java.awt.Font("Lucida Grande", 0, 18)); // NOI18N
-        jLabel3.setText("Enter your Surname");
+        jLabel3.setText("Enter your Name");
 
         Send.setFont(new java.awt.Font("Lucida Grande", 1, 13)); // NOI18N
         Send.setText("Enter");
@@ -549,34 +550,34 @@ public class Input extends javax.swing.JFrame {
         });
         jPanel1.add(deptIS);
 
+        jLabel9.setText("Format: Lastname, F");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addGap(20, 20, 20)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                            .addGap(34, 34, 34)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jLabel7)
-                                .addComponent(StudentNumber, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(ConnectToServerBT)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(Send, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(18, 18, 18)
-                                        .addComponent(clear, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                        .addGroup(layout.createSequentialGroup()
-                            .addGap(52, 52, 52)
-                            .addComponent(concern, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(concern, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(StudentNumber)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(20, 20, 20)
-                        .addComponent(jLabel3)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel7)
+                            .addComponent(jLabel3)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(10, 10, 10)
+                                .addComponent(jLabel9))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(ConnectToServerBT)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(99, 99, 99))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(Send, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(30, 30, 30)
+                        .addComponent(clear, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addGap(24, 24, 24))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -584,20 +585,22 @@ public class Input extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel9)
+                .addGap(18, 18, 18)
                 .addComponent(StudentNumber, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jLabel7)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(concern, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(clear, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(Send, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(Send, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(clear, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(ConnectToServerBT))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         pack();
@@ -700,21 +703,26 @@ public class Input extends javax.swing.JFrame {
         String student=StudentNumber.getText();
         try
         {
-            int studnum = Integer.parseInt(student);
+            String[] name = student.split(",");
             if(StudentNumber.getText().isEmpty())
-                JOptionPane.showMessageDialog(rootPane, "Please enter your student number", "Blank Student Number", JOptionPane.INFORMATION_MESSAGE);
-            else if(student.length() != 10 || !student.substring(0, 2).equals("20"))
-                JOptionPane.showMessageDialog(rootPane, student + " is not a valid student number.", "Invalid Student Number", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(rootPane, "Please enter your Last Name and your First Name Initial\n"
+                        + "Example: Dela Cruz, J", "Blank Name", JOptionPane.INFORMATION_MESSAGE);
+            else if(name.length < 2)
+                JOptionPane.showMessageDialog(rootPane, "Please enter your name in this format:\n"
+                        + "Lastname, F\n\n"
+                        + "Example: Dela Cruz, J", "Invalid Student Number", JOptionPane.WARNING_MESSAGE);
             else
             {
-                    sent = "IT/" + StudentNumber.getText() + "/" + concern.getSelectedItem();
+                    sent = name[0].substring(0, 1).toUpperCase() + name[0].substring(1)
+                            + ", " + name[1].trim().substring(0, 1).toUpperCase() + "|" + concern.getSelectedItem();
                     sendToServer(sent);
-                
+                    System.out.println(sent);
             }
         }
-        catch (NumberFormatException nfe)
+        catch (Exception e)
         {
-                JOptionPane.showMessageDialog(rootPane, student + " is not a valid student number.\nError: Exceeded 10 digits or letter detected.", "Invalid Student Number", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(rootPane, "Error occured", "Error", JOptionPane.ERROR_MESSAGE);
+                e.printStackTrace();
         }
     }//GEN-LAST:event_SendActionPerformed
 
@@ -883,6 +891,7 @@ public class Input extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JButton okButton;
     private javax.swing.JTextField portTextField;

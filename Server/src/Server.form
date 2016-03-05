@@ -1569,7 +1569,7 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="viewITrecord">
               <Properties>
-                <Property name="text" type="java.lang.String" value="View Generated I.T. Queue Record"/>
+                <Property name="text" type="java.lang.String" value="View Generated Queue Record"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="viewITrecordActionPerformed"/>
@@ -1579,13 +1579,11 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="allIT">
               <Properties>
-                <Property name="text" type="java.lang.String" value="I.T. Records Directory"/>
+                <Property name="text" type="java.lang.String" value="Records Directory"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="allITActionPerformed"/>
               </Events>
-            </MenuItem>
-            <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator5">
             </MenuItem>
           </SubComponents>
         </Menu>
@@ -1709,10 +1707,13 @@
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-            <TitledBorder title="I.T. Queue Controller"/>
+            <TitledBorder title="Queue Controller"/>
           </Border>
         </Property>
       </Properties>
+      <AccessibilityProperties>
+        <Property name="AccessibleContext.accessibleName" type="java.lang.String" value="Queue Controller"/>
+      </AccessibilityProperties>
 
       <Layout>
         <DimensionLayout dim="0">
@@ -1823,7 +1824,7 @@
           <Properties>
             <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
               <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-                <TitledBorder title="I.T. Queue List"/>
+                <TitledBorder title="Queue List"/>
               </Border>
             </Property>
           </Properties>

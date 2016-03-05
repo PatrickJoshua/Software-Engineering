@@ -1,4 +1,5 @@
 
+import com.opencsv.CSVReader;
 import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -14,6 +15,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.StringReader;
 import java.net.BindException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -145,12 +147,12 @@ class cutoff extends Thread
 class ServerTest extends Thread
 {
    private ServerSocket serverSocket;
-   public static File queue = new File("QueueIT.txt");
+   public static File queue = new File("Queue.txt");
    static Date date = new Date();
    static DateFormat dateFormat = new SimpleDateFormat("yy-MM-dd");
    public static File folder = new File("Records");
-   public static File itFolder = new File("Records/IT");
-   public static File itQueueRecord = new File("Records/IT/IT_" + dateFormat.format(date) + ".csv");
+   public static File itFolder = new File("Records");
+   public static File itQueueRecord = new File("Records/" + dateFormat.format(date) + ".csv");
    Connection con = null;
 
    public ServerTest(int port, Connection conn) throws IOException
@@ -161,19 +163,20 @@ class ServerTest extends Thread
    }
 
    @SuppressWarnings("finally")
-public boolean scanForDuplicate(String department, String studNum)
+public boolean scanForDuplicate(String studNum)
    {
        boolean duplicate = false;
        String txt;
        BufferedReader br = null;
        try
        {
-           if(department.equalsIgnoreCase("IT"))
-               br = new BufferedReader(new FileReader(queue));
+            br = new BufferedReader(new FileReader(queue));
+            String[] record;
 
            while((txt = br.readLine()) != null)
            {
-               if(txt.substring(0, 10).equals(studNum))
+               record = txt.split("\\|");
+               if(record[0].trim().equalsIgnoreCase(studNum.trim()))
                {
                    duplicate = true;
                    break;
@@ -209,10 +212,12 @@ public boolean maxLimiter(String department, String studentNumber)
        int count = 0;
        try
        {
-           if(department.equalsIgnoreCase("IT"))
-               br = new BufferedReader(new FileReader(itQueueRecord));
+            br = new BufferedReader(new FileReader(itQueueRecord));
+            String[] record;
+
            while((txt = br.readLine()) != null)
            {
+               record = txt.split("|");
                if(txt.charAt(7) == ',')
                {
                    if(txt.substring(8, 18).equals(studentNumber))
@@ -268,15 +273,16 @@ public boolean maxLimiter(String department, String studentNumber)
                queue.createNewFile();
             BufferedReader br = new BufferedReader(new FileReader(queue));
             String currentLine;
-            for(int i=0;(currentLine = br.readLine()) != null; i++)
-                Global.itQueueListData[i] = currentLine.substring(0, 10);
+            for(int i=0;(currentLine = br.readLine()) != null; i++) {
+                Global.itQueueListData[i] = currentLine.split("\\|")[0];
+            }
             Server.itUpcomingList.setListData(Global.itQueueListData);
             Server.itQueueList.setListData(Global.itQueueListData);
             br.close();
         }
         catch (IOException ioe)
         {
-            Server.logg.append("Failed to update Upcoming IT Queue List\n");
+            Server.logg.append("Failed to update Upcoming Queue List\n");
         }
 
    }
@@ -308,20 +314,20 @@ public boolean maxLimiter(String department, String studentNumber)
                     else
                     {
                         boolean canceled = false;
-                        String department = received.substring(0, 2);
-                        String studentNumber = received.substring(3,13);
-                        String concern = received.substring(14);
+                        String[] receivedArray = received.split("\\|");
+                        //String department = receivedArray[0];
+                        String studentNumber = receivedArray[0];
+                        String concern = receivedArray[1];
                         BufferedWriter bw,recordWriter;
-                        boolean duplicate = scanForDuplicate(department,studentNumber);
-                        boolean abuse = maxLimiter(department,studentNumber);
+                        boolean duplicate = scanForDuplicate(studentNumber);
+                        //boolean abuse = maxLimiter(department,studentNumber);
+                        
                         if(duplicate)
                             out.writeUTF("duplicate");
-                        else if(abuse)
-                            out.writeUTF("abuse");
+                        //else if(abuse)
+                        //    out.writeUTF("abuse");
                         else
                         {
-                            if(department.equalsIgnoreCase("IT"))
-                            {
                                 bw = new BufferedWriter(new FileWriter(queue, true));
                                 //recordWriter = new BufferedWriter(new FileWriter(itQueueRecord,true));
                                 out.writeUTF(Global.getITlength() + "");
@@ -333,21 +339,13 @@ public boolean maxLimiter(String department, String studentNumber)
                                     Global.newITStudent = true;
                                     Global.newITStudentDisp = true;
                                 }
-                            }
-                            else
-                            {
-                                Server.logg.append("Client entered an invalid department: " + department + "\n");
-                                break;
-                            }
                             if(!canceled)
                             {
-                                Server.logg.append("New student at " + department + ": " + studentNumber + "\n");
-                                bw.append(studentNumber + "/" + concern);
+                                Server.logg.append("New student in queue: " + studentNumber + "\n");
+                                bw.append(studentNumber + "|" + concern);
                                 bw.newLine();
                                 bw.close();
-
-                                if(department.equalsIgnoreCase("IT"))
-                                    updateITQueueList();
+                                updateITQueueList();
                             }
                         }
                     }
@@ -378,15 +376,9 @@ public boolean maxLimiter(String department, String studentNumber)
                     if(Global.nextCommand)
                     {
                         out.writeUTF(Global.toDisplay);
-                        if(Global.toDisplay.substring(0,2).equalsIgnoreCase("CS"))
-                            Server.csNowServing.setText(Global.toDisplay.substring(2));
-                        else if(Global.toDisplay.substring(0,2).equalsIgnoreCase("IS"))
-                            Server.isNowServing.setText(Global.toDisplay.substring(2));
+                        //if mac, announce name
                         if(Global.mac && (!Global.toDisplay.contains("None")) && (!Global.toDisplay.equalsIgnoreCase("resume")) && (!Global.toDisplay.equalsIgnoreCase("lunch")))
-                         {
-                             String tts = "Now serving " + Global.toDisplay.substring(2,6) + " " + Global.toDisplay.substring(6) + " on " + Global.toDisplay.substring(0, 1) + " " + Global.toDisplay.substring(1, 2) + " department";
-                             Runtime.getRuntime().exec("say " + tts);
-                         }
+                             Runtime.getRuntime().exec("say " + Global.toDisplay);
                         Global.nextCommand=false;
                         Global.toDisplay=null;
                     }
@@ -459,7 +451,7 @@ public boolean maxLimiter(String department, String studentNumber)
                 Date date = new Date();
                 DateFormat df = new SimpleDateFormat("HH:mm:ss");
                 BufferedWriter br = new BufferedWriter(new FileWriter(itQueueRecord, true));
-                br.write(df.format(date) + "," + Global.itStudentPending + "," + Global.itConcernPending + "," + Server.remarks.getText());
+                br.write(df.format(date) + ",\"" + Global.itStudentPending + "\",\"" + Global.itConcernPending + "\",\"" + Server.remarks.getText() + "\"");
                 br.newLine();
                 br.close();
                 //write to database
@@ -471,7 +463,7 @@ public boolean maxLimiter(String department, String studentNumber)
                         ps.executeUpdate();
                         ps.close();
                     } catch (SQLException ex) {
-                        Server.logg.append("[IT]Database error. " + ex.getMessage());
+                        Server.logg.append("Database error. " + ex.getMessage());
                     }
                 }
             }
@@ -480,41 +472,51 @@ public boolean maxLimiter(String department, String studentNumber)
             getFromFile = br.readLine();
             if(getFromFile == null)
             {
-                Server.logg.append("[IT Request] Queue empty\n");
+                Server.logg.append("Queue is now empty\n");
                 Server.itNowServingTxt.setText("None");
                 Server.itNowServing.setText("None");
                 Server.nextTxt.setText("");
                 Server.itConcernTxt.setText("Concern: ");
-                JOptionPane.showMessageDialog(null, "No one is currently on queue", "I.T. Queue is Empty", JOptionPane.INFORMATION_MESSAGE);
-                Global.toDisplay="ITNone";
+                JOptionPane.showMessageDialog(null, "No one is currently on queue", "Queue is Empty", JOptionPane.INFORMATION_MESSAGE);
+                Global.toDisplay="None";
                 Global.nextCommand=true;
                 Global.pendingIT = false;
                 br.close();
                 br = null;
             }
-            else
+            else    //begin processing next in queue
             {
-                Global.toDisplay = "IT" + getFromFile.substring(0, 10);
+                String[] splitted = getFromFile.split("\\|");
+                Global.toDisplay = splitted[0];
                 Global.nextCommand=true;
-                Server.itNowServingTxt.setText(getFromFile.substring(0, 10));
-                Server.itNowServing.setText(getFromFile.substring(0, 10));
-                Global.itStudentPending = getFromFile.substring(0,10);
-                Server.logg.append("IT Now Serving " + getFromFile.substring(0,10) + "\n");
-                try
+                Server.itNowServingTxt.setText(splitted[0]);
+                Server.itNowServing.setText(splitted[0]);
+                Global.itStudentPending = splitted[0];
+                //test csv
+                //for(String x : csv)
+                //    System.out.println("CSVTEST: " + x);
+                Server.logg.append("Now Serving " + splitted[0] + "\n");
+                String[] splittedUpcoming = new String[2];
+                try //sen
                 {
-                    if((upcoming = br.readLine()) != null)  //output to display client
-                        Server.nextTxt.setText("Next: " + upcoming.substring(0, 10));
-                    else
-                        Server.nextTxt.setText("");
+                    if((upcoming = br.readLine()) != null) {  //output to display client
+                    splittedUpcoming = upcoming.split("\\|");
+                        Server.nextTxt.setText("Next: " + splittedUpcoming[0]);
+                    }
+                    else {
+                        Server.nextTxt.setText(""); 
+                        splittedUpcoming[0] = "";
+                        splittedUpcoming[1] = "";
+                    }
                 }
                 catch (IOException ioe)
                 {
-                    Server.logg.append("Information: Failed to retreive next client.\nIT Queue file might have been deleted\n");
+                    Server.logg.append("Information: Failed to retreive next client.\nQueue file might have been deleted\n");
                 }
                 br.close();
                 br = null;
-                Server.itConcernTxt.setText("Concern: " + getFromFile.substring(11));
-                Global.itConcernPending = getFromFile.substring(11);
+                Server.itConcernTxt.setText("Concern: " + splittedUpcoming[1]);
+                Global.itConcernPending = splittedUpcoming[1];
                 Global.pendingIT = true;
 
                 //file trim
@@ -574,11 +576,11 @@ public boolean maxLimiter(String department, String studentNumber)
        }
        catch (FileNotFoundException fnfe)
        {
-            JOptionPane.showMessageDialog(null, "Error calling the next in queue.\nI.T. Queue file not found. Check if files aren't deleted.", "Next Command Failed", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Error calling the next in queue.\nQueue file not found. Check if files aren't deleted.", "Next Command Failed", JOptionPane.ERROR_MESSAGE);
        }
        catch (IOException ioe)
        {
-            JOptionPane.showMessageDialog(null, "There's a problem reading or writing on IT Queue file.", "File Access Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "There's a problem reading or writing on Queue file.", "File Access Error", JOptionPane.ERROR_MESSAGE);
        }
        finally
        {
@@ -613,7 +615,7 @@ public class Server extends javax.swing.JFrame {
                 if(!ServerTest.itQueueRecord.exists())
                 {
                     if(!ServerTest.itQueueRecord.createNewFile())
-                        Server.logg.append("Cannot create IT Queue Record");
+                        Server.logg.append("Cannot create Queue Record");
                     else
                     {
                         BufferedWriter br = new BufferedWriter(new FileWriter(ServerTest.itQueueRecord));
@@ -628,7 +630,7 @@ public class Server extends javax.swing.JFrame {
                         Server.logg.append("Failed to initialize Queue Records\n");
             }
         //Connect to Databse    
-        try {
+        /*try {
             Server.logg.append("Attempting to connect to the database...\n");
             Class.forName("org.apache.derby.jdbc.ClientDriver");
             con = DriverManager.getConnection("jdbc:derby://localhost:1527/QueueDB", "dbadmin", "dba");
@@ -637,7 +639,7 @@ public class Server extends javax.swing.JFrame {
             Server.logg.append("Failed to connect to database. Records output will be redirected to excel files.\n");
         } catch (ClassNotFoundException x) {
             Server.logg.append("Error loading java database drivers.\n");
-        }
+        }*/
     }
     
     public static Connection con = null;
@@ -789,7 +791,6 @@ public class Server extends javax.swing.JFrame {
         viewITrecord = new javax.swing.JMenuItem();
         jSeparator3 = new javax.swing.JPopupMenu.Separator();
         allIT = new javax.swing.JMenuItem();
-        jSeparator5 = new javax.swing.JPopupMenu.Separator();
         jMenu3 = new javax.swing.JMenu();
         jMenuItem4 = new javax.swing.JMenuItem();
 
@@ -1656,7 +1657,7 @@ public class Server extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
-        queueControlPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("I.T. Queue Controller"));
+        queueControlPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Queue Controller"));
 
         jLabel22.setText("Now Serving:");
 
@@ -1676,7 +1677,7 @@ public class Server extends javax.swing.JFrame {
             }
         });
 
-        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("I.T. Queue List"));
+        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Queue List"));
 
         itUpcomingList.setMinimumSize(new java.awt.Dimension(82, 17));
         itUpcomingList.setPreferredSize(new java.awt.Dimension(82, 17));
@@ -1817,7 +1818,7 @@ public class Server extends javax.swing.JFrame {
         viewISfile.add(jMenuItem5);
         viewISfile.add(jSeparator2);
 
-        viewITrecord.setText("View Generated I.T. Queue Record");
+        viewITrecord.setText("View Generated Queue Record");
         viewITrecord.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 viewITrecordActionPerformed(evt);
@@ -1826,14 +1827,13 @@ public class Server extends javax.swing.JFrame {
         viewISfile.add(viewITrecord);
         viewISfile.add(jSeparator3);
 
-        allIT.setText("I.T. Records Directory");
+        allIT.setText("Records Directory");
         allIT.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 allITActionPerformed(evt);
             }
         });
         viewISfile.add(allIT);
-        viewISfile.add(jSeparator5);
 
         jMenuBar1.add(viewISfile);
 
@@ -1865,6 +1865,8 @@ public class Server extends javax.swing.JFrame {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(logPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
+
+        queueControlPanel.getAccessibleContext().setAccessibleName("Queue Controller");
 
         pack();
         setLocationRelativeTo(null);
@@ -2110,18 +2112,18 @@ public class Server extends javax.swing.JFrame {
         try
         {
             if(Global.mac)
-                Runtime.getRuntime().exec("open Records/IT/" + ServerTest.itQueueRecord.getName());
+                Runtime.getRuntime().exec("open Records/" + ServerTest.itQueueRecord.getName());
             else if(System.getProperty("os.name").contains("Windows"))
             {
     //            Runtime.getRuntime().exec("start excel Records\\IT\\" + ServerTest.itQueueRecord.getName());
                 //Runtime.getRuntime().exec("start QueueIT.txt");
                 Runtime runtime = Runtime.getRuntime();
-                Process process = runtime.exec("cmd /c start Records\\IT\\" + ServerTest.itQueueRecord.getName());
+                Process process = runtime.exec("cmd /c start Records\\" + ServerTest.itQueueRecord.getName());
             }
             else if(System.getProperty("os.name").contains("Linux"))
-                Runtime.getRuntime().exec("gnome-open Records/IT/" + ServerTest.itQueueRecord.getName());
+                Runtime.getRuntime().exec("gnome-open Records/" + ServerTest.itQueueRecord.getName());
             else
-                JOptionPane.showMessageDialog(rootPane, "You can open the file at Records\\IT\\" + ServerTest.itQueueRecord.getName(), "Unsupported Operating System", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(rootPane, "You can open the file at Records\\" + ServerTest.itQueueRecord.getName(), "Unsupported Operating System", JOptionPane.ERROR_MESSAGE);
         }
         catch (IOException ioe)
         {
@@ -2168,11 +2170,11 @@ public class Server extends javax.swing.JFrame {
         try
         {
             if(Global.mac)
-                Runtime.getRuntime().exec("open Records/IT/");
+                Runtime.getRuntime().exec("open Records/");
             else if(System.getProperty("os.name").contains("Windows"))
-                Runtime.getRuntime().exec("cmd /c explorer.exe Records\\IT");
+                Runtime.getRuntime().exec("cmd /c explorer.exe Records\\");
             else if(System.getProperty("os.name").contains("Linux"))
-                Runtime.getRuntime().exec("gnome-open Records/IT/");
+                Runtime.getRuntime().exec("gnome-open Records/");
             else
                 JOptionPane.showMessageDialog(rootPane, "You can open the folder located at Records/IT", "Unsupported Operating System", JOptionPane.ERROR_MESSAGE);
         }
@@ -2424,7 +2426,6 @@ public class Server extends javax.swing.JFrame {
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator2;
     private javax.swing.JPopupMenu.Separator jSeparator3;
-    private javax.swing.JPopupMenu.Separator jSeparator5;
     public static javax.swing.JSpinner jSpinner1;
     public static javax.swing.JSpinner jSpinner10;
     public static javax.swing.JSpinner jSpinner11;

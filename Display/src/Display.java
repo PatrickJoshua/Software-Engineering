@@ -44,7 +44,7 @@ class Globalvars
 
     public static void writeIT() throws IOException
     {
-        itWrite = new BufferedWriter(new FileWriter("ITqueue.txt"));
+        itWrite = new BufferedWriter(new FileWriter("queue.txt"));
         for(int i=0; i<ITlastIndex; i++)
         {
             itWrite.append(upcomingIT[i]);
@@ -66,7 +66,7 @@ class ITReceiverThread extends Thread
         try
         {
             //recover
-            File itQueue = new File("ITqueue.txt");
+            File itQueue = new File("queue.txt");
             if(!itQueue.exists())
                 itQueue.createNewFile();
             else
@@ -154,16 +154,15 @@ class Wait4Next extends Thread
                          tone.start();
                          if(Globalvars.mac)
                          {
-                             String tts = "Now serving " + studentNumber.substring(0, 4) + " " + studentNumber.substring(4) + " on " + department.substring(0, 1) + " " + department.substring(1) + " department";
-                             Runtime.getRuntime().exec("say " + tts);
+                             //String tts = "Now serving " + studentNumber.substring(0, 4) + " " + studentNumber.substring(4) + " on " + department.substring(0, 1) + " " + department.substring(1) + " department";
+                             Runtime.getRuntime().exec("say " + "Now serving " + studentNumber);
                          }
                          Display.blinkIT();
                      }
                  }
                  else
                  {
-                     department = received.substring(0, 2);
-                     studentNumber = received.substring(2);
+                     studentNumber = received;
                      //play notification
                      if(!studentNumber.equalsIgnoreCase("none"))
                      {
@@ -174,32 +173,27 @@ class Wait4Next extends Thread
                          if(Globalvars.mac)
                          {
                              String tts = "Now serving " + studentNumber.substring(0, 4) + " " + studentNumber.substring(4) + " on " + department.substring(0, 1) + " " + department.substring(1) + " department";
-                             Runtime.getRuntime().exec("say " + tts);
+                             Runtime.getRuntime().exec("say " + "Now serving " + studentNumber);
                          }
                      }
                      
-                     if(department.equalsIgnoreCase("IT"))
-                     {
-                         Display.ITserving.setText(studentNumber);
-                         if(Globalvars.ITlastIndex>0)
-                         {
-                             for(int i=0;i<Globalvars.ITlastIndex;i++)
-                                Globalvars.upcomingIT[i] = Globalvars.upcomingIT[i+1];
-                             if(Globalvars.ITlastIndex!=0)
-                                 Globalvars.ITlastIndex--;
-                             Display.ITupcoming.setListData(Globalvars.upcomingIT);
-                             Globalvars.writeIT();
-                             Display.blinkIT();
-                         }
-                         else
-                         {
-                             Globalvars.upcomingIT[0] = "";
-                             Display.ITupcoming.setListData(Globalvars.upcomingIT);
-                             Globalvars.writeIT();
-                         }
-                     }
-                     else
-                         JOptionPane.showMessageDialog(null, "Error occured. Please call the administrator.\nError: Unidentified department has queued.", "ALERT!", JOptionPane.ERROR_MESSAGE);
+                    Display.ITserving.setText(studentNumber);
+                    if(Globalvars.ITlastIndex>0)
+                    {
+                        for(int i=0;i<Globalvars.ITlastIndex;i++)
+                           Globalvars.upcomingIT[i] = Globalvars.upcomingIT[i+1];
+                        if(Globalvars.ITlastIndex!=0)
+                            Globalvars.ITlastIndex--;
+                        Display.ITupcoming.setListData(Globalvars.upcomingIT);
+                        Globalvars.writeIT();
+                        Display.blinkIT();
+                    }
+                    else
+                    {
+                        Globalvars.upcomingIT[0] = "";
+                        Display.ITupcoming.setListData(Globalvars.upcomingIT);
+                        Globalvars.writeIT();
+                    }
                  }
                  try {
                     Thread.sleep(500);
@@ -263,7 +257,7 @@ public class Display extends javax.swing.JFrame {
         }
         catch (InterruptedException ie)
         {
-            JOptionPane.showMessageDialog(null, "IS Label cannot blink", "Interrupted Exception", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Label cannot blink", "Interrupted Exception", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -527,7 +521,7 @@ public class Display extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addComponent(CSserving, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
+                    .addComponent(CSserving, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel10)
                         .addGap(0, 0, Short.MAX_VALUE)))
@@ -540,7 +534,7 @@ public class Display extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel10)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 218, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -564,11 +558,11 @@ public class Display extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 275, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup()
                         .addComponent(jLabel9)
                         .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(ITserving, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE))
+                    .addComponent(ITserving, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -578,7 +572,7 @@ public class Display extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel9)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 218, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -603,7 +597,7 @@ public class Display extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addComponent(ISserving, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
+                    .addComponent(ISserving, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addComponent(jLabel11)
                         .addGap(0, 0, Short.MAX_VALUE)))
@@ -616,7 +610,7 @@ public class Display extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel11)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -626,39 +620,43 @@ public class Display extends javax.swing.JFrame {
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(18, 18, 18)
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(18, 18, 18)
-                .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(113, 113, 113)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(351, 351, 351))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                .addGap(0, 0, 0)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap())
+                    .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, 1072, Short.MAX_VALUE)
+            .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(ConnectToServerBT, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 1052, Short.MAX_VALUE)
-                    .addComponent(jPanel4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(ConnectToServerBT, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
+            .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addComponent(jLabel3)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(1, 1, 1)
                 .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(ConnectToServerBT, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -770,12 +768,12 @@ public class Display extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    public static javax.swing.JLabel CSserving;
-    public static javax.swing.JList CSupcoming;
+    private javax.swing.JLabel CSserving;
+    private javax.swing.JList CSupcoming;
     private javax.swing.JButton ConnectNow;
     public static javax.swing.JButton ConnectToServerBT;
-    public static javax.swing.JLabel ISserving;
-    public static javax.swing.JList ISupcoming;
+    private javax.swing.JLabel ISserving;
+    private javax.swing.JList ISupcoming;
     public static javax.swing.JLabel ITserving;
     public static javax.swing.JList ITupcoming;
     private javax.swing.JTextField ServerIPTextField;
