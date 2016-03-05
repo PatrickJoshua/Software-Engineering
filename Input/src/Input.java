@@ -1,4 +1,6 @@
 
+import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -10,6 +12,8 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
@@ -59,7 +63,7 @@ class cutoffListener extends Thread
                     b8.setEnabled(connected);
                     b9.setEnabled(connected);
                     C.setEnabled(connected);*/
-                    JOptionPane.showMessageDialog(null, "Thank you for using UST IICS Queuing System.\nFor unfinished business, please come again tomorrow.", "End of Day Cut-off", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "St. Jude College Queuing System is now shutting down.\nFor unfinished business, please come again tomorrow.", "End of Day Cut-off", JOptionPane.INFORMATION_MESSAGE);
                     System.exit(0);
                 }
                 else if(serverCommand.equalsIgnoreCase("lunch"))
@@ -87,13 +91,25 @@ public class Input extends javax.swing.JFrame {
     
     public Input() {
         initComponents();
+//        BufferedImage myPicture;
+//        try {
+//            myPicture = ImageIO.read(Input.class.getResourceAsStream("resources/mainlogo.png"));
+//            //myPicture = ImageIO.read(new File("mainlogo.gif"));
+//            //picLabel = new javax.swing.JLabel(new ImageIcon(myPicture));
+//            int width = (myPicture.getWidth()*logoLabel.getHeight())/myPicture.getHeight();
+//            Image resized = myPicture.getScaledInstance(width, logoLabel.getHeight(), Image.SCALE_SMOOTH);
+//            logoLabel.setIcon(new ImageIcon(resized));
+//            logoLabel.setText("");
+//        } catch (IOException ex) {
+//            Logger.getLogger(Input.class.getName()).log(Level.SEVERE, null, ex);
+//        }
         if(prefs.get("SERVERIP", "").isEmpty()) {
             ConnectToServerBT.requestFocus();
             progress.setVisible(false);
             connectToServer.setLocationRelativeTo(null);
             connectToServer.setVisible(true);
         } else {
-            ConnectNowActionPerformed(new java.awt.event.ActionEvent(C, port, ServerIP));
+            ConnectNowActionPerformed(new java.awt.event.ActionEvent(new String(),0, new String()));
         }
     }
     
@@ -139,9 +155,6 @@ public class Input extends javax.swing.JFrame {
                 
                 Success.setLocationRelativeTo(null);
                 Success.setVisible(true);
-                deptIT.setSelected(true);
-                deptIS.setSelected(false);
-                deptCS.setSelected(false);
                 StudentNumber.setText(null);
                 concern.setSelectedIndex(0);
             }
@@ -176,29 +189,15 @@ public class Input extends javax.swing.JFrame {
         jLabel8 = new javax.swing.JLabel();
         cancel = new javax.swing.JButton();
         ConnectToServerBT = new javax.swing.JButton();
-        StudentNumber = new javax.swing.JTextField();
-        jLabel3 = new javax.swing.JLabel();
-        Send = new javax.swing.JButton();
-        clear = new javax.swing.JButton();
-        jLabel7 = new javax.swing.JLabel();
-        concern = new javax.swing.JComboBox();
+        logoLabel = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
-        b7 = new javax.swing.JButton();
-        b8 = new javax.swing.JButton();
-        b9 = new javax.swing.JButton();
-        b4 = new javax.swing.JButton();
-        b5 = new javax.swing.JButton();
-        b6 = new javax.swing.JButton();
-        b1 = new javax.swing.JButton();
-        b2 = new javax.swing.JButton();
-        b3 = new javax.swing.JButton();
-        C = new javax.swing.JButton();
-        b0 = new javax.swing.JButton();
-        backspace = new javax.swing.JButton();
-        deptIT = new javax.swing.JRadioButton();
-        deptCS = new javax.swing.JRadioButton();
-        deptIS = new javax.swing.JRadioButton();
+        Send = new javax.swing.JButton();
+        jLabel7 = new javax.swing.JLabel();
+        clear = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
+        StudentNumber = new javax.swing.JTextField();
         jLabel9 = new javax.swing.JLabel();
+        concern = new javax.swing.JComboBox();
 
         connectToServer.setTitle("Connect to Server");
         connectToServer.setMinimumSize(new java.awt.Dimension(270, 165));
@@ -351,8 +350,13 @@ public class Input extends javax.swing.JFrame {
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
-        setTitle("IICS Queuing System Student Input Kiosk - " + dateFormat.format(date));
+        setTitle("St. Jude College Queuing System Student Input Kiosk - " + dateFormat.format(date));
         setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentResized(java.awt.event.ComponentEvent evt) {
+                formComponentResized(evt);
+            }
+        });
 
         ConnectToServerBT.setText("Status: Not Connected");
         ConnectToServerBT.addActionListener(new java.awt.event.ActionListener() {
@@ -361,17 +365,15 @@ public class Input extends javax.swing.JFrame {
             }
         });
 
-        StudentNumber.setFont(new java.awt.Font("Lucida Grande", 0, 24)); // NOI18N
-        StudentNumber.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        StudentNumber.setEnabled(false);
-        StudentNumber.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                StudentNumberActionPerformed(evt);
+        logoLabel.setFont(new java.awt.Font("Impact", 0, 36)); // NOI18N
+        logoLabel.setForeground(new java.awt.Color(158, 0, 0));
+        logoLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        logoLabel.setText("St. Jude College");
+        logoLabel.addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentResized(java.awt.event.ComponentEvent evt) {
+                logoLabelComponentResized(evt);
             }
         });
-
-        jLabel3.setFont(new java.awt.Font("Lucida Grande", 0, 18)); // NOI18N
-        jLabel3.setText("Enter your Name");
 
         Send.setFont(new java.awt.Font("Lucida Grande", 1, 13)); // NOI18N
         Send.setText("Enter");
@@ -383,6 +385,8 @@ public class Input extends javax.swing.JFrame {
             }
         });
 
+        jLabel7.setText("Concern:");
+
         clear.setText("Clear");
         clear.setEnabled(false);
         clear.setPreferredSize(new java.awt.Dimension(75, 30));
@@ -392,196 +396,54 @@ public class Input extends javax.swing.JFrame {
             }
         });
 
-        jLabel7.setText("Concern:");
+        jLabel3.setFont(new java.awt.Font("Lucida Grande", 0, 18)); // NOI18N
+        jLabel3.setText("Enter your Name");
 
-        concern.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Course Advising", "Add/Drop Subjects", "Conditional Enrollment", "Application for Waiver", "Returnees", "Request for Overload", "Request for Petition", "Request for Crediting Subjects", "Cross Enrollment", "Department Chair Consultation" }));
-        concern.setEnabled(false);
-
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Input Panel"));
-        jPanel1.setLayout(new java.awt.GridLayout(4, 3, 5, 5));
-
-        b7.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
-        b7.setText("7");
-        b7.setEnabled(false);
-        b7.addActionListener(new java.awt.event.ActionListener() {
+        StudentNumber.setFont(new java.awt.Font("Lucida Grande", 0, 24)); // NOI18N
+        StudentNumber.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        StudentNumber.setEnabled(false);
+        StudentNumber.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                b7ActionPerformed(evt);
+                StudentNumberActionPerformed(evt);
             }
         });
-        jPanel1.add(b7);
-
-        b8.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
-        b8.setText("8");
-        b8.setEnabled(false);
-        b8.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                b8ActionPerformed(evt);
-            }
-        });
-        jPanel1.add(b8);
-
-        b9.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
-        b9.setText("9");
-        b9.setEnabled(false);
-        b9.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                b9ActionPerformed(evt);
-            }
-        });
-        jPanel1.add(b9);
-
-        b4.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
-        b4.setText("4");
-        b4.setEnabled(false);
-        b4.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                b4ActionPerformed(evt);
-            }
-        });
-        jPanel1.add(b4);
-
-        b5.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
-        b5.setText("5");
-        b5.setEnabled(false);
-        b5.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                b5ActionPerformed(evt);
-            }
-        });
-        jPanel1.add(b5);
-
-        b6.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
-        b6.setText("6");
-        b6.setEnabled(false);
-        b6.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                b6ActionPerformed(evt);
-            }
-        });
-        jPanel1.add(b6);
-
-        b1.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
-        b1.setText("1");
-        b1.setEnabled(false);
-        b1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                b1ActionPerformed(evt);
-            }
-        });
-        jPanel1.add(b1);
-
-        b2.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
-        b2.setText("2");
-        b2.setEnabled(false);
-        b2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                b2ActionPerformed(evt);
-            }
-        });
-        jPanel1.add(b2);
-
-        b3.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
-        b3.setText("3");
-        b3.setEnabled(false);
-        b3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                b3ActionPerformed(evt);
-            }
-        });
-        jPanel1.add(b3);
-
-        C.setText("C");
-        C.setEnabled(false);
-        C.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                CActionPerformed(evt);
-            }
-        });
-        jPanel1.add(C);
-
-        b0.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
-        b0.setText("0");
-        b0.setEnabled(false);
-        b0.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                b0ActionPerformed(evt);
-            }
-        });
-        jPanel1.add(b0);
-
-        backspace.setText("<-");
-        backspace.setEnabled(false);
-        backspace.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                backspaceActionPerformed(evt);
-            }
-        });
-        jPanel1.add(backspace);
-
-        deptIT.setForeground(new java.awt.Color(0, 153, 0));
-        deptIT.setText("Information Technology");
-        deptIT.setEnabled(false);
-        deptIT.setName("deptIT"); // NOI18N
-        deptIT.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                deptITActionPerformed(evt);
-            }
-        });
-        jPanel1.add(deptIT);
-
-        deptCS.setForeground(new java.awt.Color(0, 51, 204));
-        deptCS.setText("Computer Science");
-        deptCS.setEnabled(false);
-        deptCS.setName("dept"); // NOI18N
-        deptCS.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                deptCSActionPerformed(evt);
-            }
-        });
-        jPanel1.add(deptCS);
-
-        deptIS.setForeground(new java.awt.Color(255, 102, 0));
-        deptIS.setText("Information Systems");
-        deptIS.setEnabled(false);
-        deptIS.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                deptISActionPerformed(evt);
-            }
-        });
-        jPanel1.add(deptIS);
 
         jLabel9.setText("Format: Lastname, F");
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(20, 20, 20)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(concern, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(StudentNumber)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        concern.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Request for TRANSCRIPT", "Request for DIPLOMA", "Request for COPY OF GRADES", "Request for CTC/HD", "Request for CAV", "Request for CERTIFIED TRUE COPY", "Request for LICENSURE/INTERNSHIP", "Certificate of GRADUATION", "Certificate of GRADES", "Certificate of ENROLLMENT", "Certificate of G.W.A.", "Certificate of UNITS EARNED", "Certificate of COURSE DESCRIPTION" }));
+        concern.setEnabled(false);
+        concern.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                concernActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel7)
                             .addComponent(jLabel3)
-                            .addGroup(layout.createSequentialGroup()
+                            .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGap(10, 10, 10)
-                                .addComponent(jLabel9))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(ConnectToServerBT)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(99, 99, 99))
-                    .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel9)))
+                        .addGap(157, 157, 157))
+                    .addComponent(concern, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(StudentNumber)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(Send, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGap(30, 30, 30)
                         .addComponent(clear, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addGap(24, 24, 24))
+                .addContainerGap())
         );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -593,13 +455,39 @@ public class Input extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(concern, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(Send, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(clear, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(ConnectToServerBT))
+                .addContainerGap())
+        );
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(logoLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(20, 20, 20)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(ConnectToServerBT)
+                                .addGap(0, 169, Short.MAX_VALUE)))))
+                .addContainerGap())
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(logoLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 49, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
+                .addComponent(ConnectToServerBT)
                 .addContainerGap())
         );
 
@@ -651,21 +539,6 @@ public class Input extends javax.swing.JFrame {
             concern.setEnabled(connected);
             Send.setEnabled(connected);
             clear.setEnabled(connected);
-            deptIT.setEnabled(connected);
-            deptCS.setEnabled(connected);
-            deptIS.setEnabled(connected);
-            backspace.setEnabled(connected);
-            b0.setEnabled(connected);
-            b1.setEnabled(connected);
-            b2.setEnabled(connected);
-            b3.setEnabled(connected);
-            b4.setEnabled(connected);
-            b5.setEnabled(connected);
-            b6.setEnabled(connected);
-            b7.setEnabled(connected);
-            b8.setEnabled(connected);
-            b9.setEnabled(connected);
-            C.setEnabled(connected);
             Thread cutoffThread = new cutoffListener();
             cutoffThread.start();
             prefs.put("SERVERIP", ServerIP);
@@ -691,7 +564,7 @@ public class Input extends javax.swing.JFrame {
     }//GEN-LAST:event_StudentNumberActionPerformed
 
     private void SendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SendActionPerformed
-        String sent;
+        String sent = null;
 /*            if(department.getSelectedItem().equals("Information Technology"))
                 sent = "IT/" + StudentNumber.getText();
             else if(department.getSelectedItem().equals("Information Systems"))
@@ -703,20 +576,43 @@ public class Input extends javax.swing.JFrame {
         String student=StudentNumber.getText();
         try
         {
-            String[] name = student.split(",");
+            String[] name = student.trim().split(",");
             if(StudentNumber.getText().isEmpty())
-                JOptionPane.showMessageDialog(rootPane, "Please enter your Last Name and your First Name Initial\n"
-                        + "Example: Dela Cruz, J", "Blank Name", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(rootPane, "Please enter your Last Name and your Initials\n"
+                        + "Example: Dela Cruz, J. P.", "Blank Name", JOptionPane.INFORMATION_MESSAGE);
             else if(name.length < 2)
                 JOptionPane.showMessageDialog(rootPane, "Please enter your name in this format:\n"
-                        + "Lastname, F\n\n"
-                        + "Example: Dela Cruz, J", "Invalid Student Number", JOptionPane.WARNING_MESSAGE);
+                        + "Lastname, F. M.\n\n"
+                        + "Example: Dela Cruz, J. P.", "Invalid Number Format", JOptionPane.WARNING_MESSAGE);
             else
             {
-                    sent = name[0].substring(0, 1).toUpperCase() + name[0].substring(1)
-                            + ", " + name[1].trim().substring(0, 1).toUpperCase() + "|" + concern.getSelectedItem();
-                    sendToServer(sent);
-                    System.out.println(sent);
+                String[] initials = name[1].trim().split("[^a-zA-Z0-9]");
+                int countOfInitials = 0;
+                String[] finalInitials = new String[2];
+                for(String splitted : initials) {
+                    if(!splitted.isEmpty()) {
+                        finalInitials[countOfInitials++] = splitted;
+                        System.out.println("Parsed " + countOfInitials + ": " + splitted);
+                    }
+                    if(countOfInitials >= 2)
+                        break;
+                }
+                switch(countOfInitials) {
+                    //initials[0] = initials[0].replace('.', ' ').trim().substring(0,1).toUpperCase();
+                    case 1: sent = name[0].substring(0,1).toUpperCase() + name[0].substring(1).trim()
+                            + ", " + finalInitials[0].substring(0,1).toUpperCase()
+                            + ".|" + concern.getSelectedItem();
+                            sendToServer(sent);
+                            System.out.println(sent);
+                            break;
+                    case 2: sent = name[0].substring(0, 1).toUpperCase() + name[0].substring(1).trim()
+                            + ", " + finalInitials[0].substring(0,1).toUpperCase() + ". "
+                            + finalInitials[1].substring(0,1).toUpperCase() + ". |" + concern.getSelectedItem();
+                            sendToServer(sent);
+                            System.out.println(sent);
+                            break;
+                    default: JOptionPane.showMessageDialog(rootPane, "Error occured on parsing the name", "Parsing Error", JOptionPane.ERROR_MESSAGE);
+                }
             }
         }
         catch (Exception e)
@@ -734,65 +630,15 @@ public class Input extends javax.swing.JFrame {
         catch (IOException ioe)
         {
                 JOptionPane.showMessageDialog(rootPane, "Failed to add your student number", "Connection Error", JOptionPane.WARNING_MESSAGE);
+                ioe.printStackTrace();
         }
         Success.dispose();
     }//GEN-LAST:event_okButtonActionPerformed
 
     private void clearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearActionPerformed
         StudentNumber.setText("");
-        deptIT.setSelected(true);
-        deptIS.setSelected(false);
-        deptCS.setSelected(false);
         concern.setSelectedIndex(0);
     }//GEN-LAST:event_clearActionPerformed
-
-    private void b1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b1ActionPerformed
-        StudentNumber.setText(StudentNumber.getText() + 1);
-    }//GEN-LAST:event_b1ActionPerformed
-
-    private void b2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b2ActionPerformed
-        StudentNumber.setText(StudentNumber.getText() + 2);
-    }//GEN-LAST:event_b2ActionPerformed
-
-    private void b3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b3ActionPerformed
-        StudentNumber.setText(StudentNumber.getText() + 3);
-    }//GEN-LAST:event_b3ActionPerformed
-
-    private void b4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b4ActionPerformed
-        StudentNumber.setText(StudentNumber.getText() + 4);
-    }//GEN-LAST:event_b4ActionPerformed
-
-    private void b5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b5ActionPerformed
-        StudentNumber.setText(StudentNumber.getText() + 5);
-    }//GEN-LAST:event_b5ActionPerformed
-
-    private void b6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b6ActionPerformed
-        StudentNumber.setText(StudentNumber.getText() + 6);
-    }//GEN-LAST:event_b6ActionPerformed
-
-    private void b7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b7ActionPerformed
-        StudentNumber.setText(StudentNumber.getText() + 7);
-    }//GEN-LAST:event_b7ActionPerformed
-
-    private void b8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b8ActionPerformed
-        StudentNumber.setText(StudentNumber.getText() + 8);
-    }//GEN-LAST:event_b8ActionPerformed
-
-    private void b9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b9ActionPerformed
-        StudentNumber.setText(StudentNumber.getText() + 9);
-    }//GEN-LAST:event_b9ActionPerformed
-
-    private void b0ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b0ActionPerformed
-        StudentNumber.setText(StudentNumber.getText() + 0);
-    }//GEN-LAST:event_b0ActionPerformed
-
-    private void backspaceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backspaceActionPerformed
-        StudentNumber.setText(StudentNumber.getText().substring(0, StudentNumber.getText().length()-1));
-    }//GEN-LAST:event_backspaceActionPerformed
-
-    private void CActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CActionPerformed
-        StudentNumber.setText("");
-    }//GEN-LAST:event_CActionPerformed
 
     private void cancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelActionPerformed
         try
@@ -802,28 +648,44 @@ public class Input extends javax.swing.JFrame {
         catch (IOException ioe)
         {
                 JOptionPane.showMessageDialog(rootPane, "Failed to cancel your request", "Connection Error", JOptionPane.WARNING_MESSAGE);
+                ioe.printStackTrace();
         }
         Success.dispose();
     }//GEN-LAST:event_cancelActionPerformed
 
-    private void deptISActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deptISActionPerformed
+    private void logoLabelComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_logoLabelComponentResized
         // TODO add your handling code here:
-        deptCS.setSelected(false);
-        deptIS.setSelected(false);
-        deptIT.setSelected(true);
-    }//GEN-LAST:event_deptISActionPerformed
+    }//GEN-LAST:event_logoLabelComponentResized
 
-    private void deptCSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deptCSActionPerformed
-        deptCS.setSelected(false);
-        deptIS.setSelected(false);
-        deptIT.setSelected(true);
-    }//GEN-LAST:event_deptCSActionPerformed
+    private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
+//        BufferedImage myPicture;
+//        try {
+//            myPicture = ImageIO.read(Input.class.getResourceAsStream("resources/mainlogo.png"));
+//            //myPicture = ImageIO.read(new File("mainlogo.gif"));
+//            //picLabel = new javax.swing.JLabel(new ImageIcon(myPicture));
+//            int width = (myPicture.getWidth()*logoLabel.getHeight())/myPicture.getHeight();
+//            int height = (myPicture.getHeight() * logoLabel.getWidth()) / myPicture.getWidth();
+//            if(logoLabel.getWidth() < width) {
+//                width = myPicture.getWidth();
+//                height = (myPicture.getHeight() * logoLabel.getWidth()) / myPicture.getWidth();
+//            } else if(logoLabel.getHeight() < height) {
+//                height = myPicture.getHeight();
+//                width = (myPicture.getWidth()*logoLabel.getHeight())/myPicture.getHeight();
+//            } else if(logoLabel.getWidth() < myPicture.getWidth() & logoLabel.getHeight() < myPicture.getHeight()) {
+//                width = myPicture.getWidth();
+//                height = myPicture.getHeight();
+//            }
+//            Image resized = myPicture.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+//            logoLabel.setIcon(new ImageIcon(resized));
+//            logoLabel.setText("");
+//        } catch (IOException ex) {
+//            Logger.getLogger(Input.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+    }//GEN-LAST:event_formComponentResized
 
-    private void deptITActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deptITActionPerformed
-        deptIT.setSelected(true);
-        deptCS.setSelected(false);
-        deptIS.setSelected(false);
-    }//GEN-LAST:event_deptITActionPerformed
+    private void concernActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_concernActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_concernActionPerformed
 
     /**
      * @param args the command line arguments
@@ -858,31 +720,16 @@ public class Input extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton C;
     private javax.swing.JButton ConnectNow;
     public static javax.swing.JButton ConnectToServerBT;
     private javax.swing.JButton Send;
     private javax.swing.JTextField ServerIPTextField;
     private javax.swing.JTextField StudentNumber;
     private javax.swing.JDialog Success;
-    private javax.swing.JButton b0;
-    private javax.swing.JButton b1;
-    private javax.swing.JButton b2;
-    private javax.swing.JButton b3;
-    private javax.swing.JButton b4;
-    private javax.swing.JButton b5;
-    private javax.swing.JButton b6;
-    private javax.swing.JButton b7;
-    private javax.swing.JButton b8;
-    private javax.swing.JButton b9;
-    private javax.swing.JButton backspace;
     private javax.swing.JButton cancel;
     private javax.swing.JButton clear;
     private javax.swing.JComboBox concern;
     private javax.swing.JDialog connectToServer;
-    private javax.swing.JRadioButton deptCS;
-    private javax.swing.JRadioButton deptIS;
-    private javax.swing.JRadioButton deptIT;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -893,6 +740,7 @@ public class Input extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
+    public static javax.swing.JLabel logoLabel;
     private javax.swing.JButton okButton;
     private javax.swing.JTextField portTextField;
     private javax.swing.JLabel positionLabel;

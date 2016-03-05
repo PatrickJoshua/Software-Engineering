@@ -428,7 +428,7 @@ public boolean maxLimiter(String department, String studentNumber)
              else if(identity.equalsIgnoreCase("display"))
                  Server.logg.append("Display unit terminated the connection.\n");
              else if(identity.equalsIgnoreCase("IT"))
-                 Server.logg.append("IT Controller terminated the connection.\n");
+                 Server.logg.append("Controller terminated the connection.\n");
              else
                  Server.logg.append("A remote client terminated the connection abnormally.\n");
          }
@@ -491,6 +491,7 @@ public boolean maxLimiter(String department, String studentNumber)
                 Global.nextCommand=true;
                 Server.itNowServingTxt.setText(splitted[0]);
                 Server.itNowServing.setText(splitted[0]);
+                Server.itConcernTxt.setText("Concern: " + splitted[1]);
                 Global.itStudentPending = splitted[0];
                 //test csv
                 //for(String x : csv)
@@ -500,8 +501,8 @@ public boolean maxLimiter(String department, String studentNumber)
                 try //sen
                 {
                     if((upcoming = br.readLine()) != null) {  //output to display client
-                    splittedUpcoming = upcoming.split("\\|");
-                        Server.nextTxt.setText("Next: " + splittedUpcoming[0]);
+                        splittedUpcoming = upcoming.split("\\|");
+                            Server.nextTxt.setText("Next: " + splittedUpcoming[0]);
                     }
                     else {
                         Server.nextTxt.setText(""); 
@@ -515,7 +516,7 @@ public boolean maxLimiter(String department, String studentNumber)
                 }
                 br.close();
                 br = null;
-                Server.itConcernTxt.setText("Concern: " + splittedUpcoming[1]);
+                //Server.itConcernTxt.setText("Concern: " + splittedUpcoming[1]);
                 Global.itConcernPending = splittedUpcoming[1];
                 Global.pendingIT = true;
 
@@ -696,26 +697,15 @@ public class Server extends javax.swing.JFrame {
         maxSpinner = new javax.swing.JSpinner();
         setLimitBT = new javax.swing.JButton();
         connectionStatusDiag = new javax.swing.JDialog();
-        jLabel9 = new javax.swing.JLabel();
-        inputCon = new javax.swing.JLabel();
-        jLabel10 = new javax.swing.JLabel();
-        eventCon = new javax.swing.JLabel();
+        jPanel7 = new javax.swing.JPanel();
         jLabel11 = new javax.swing.JLabel();
+        jLabel10 = new javax.swing.JLabel();
         jLabel12 = new javax.swing.JLabel();
-        jLabel13 = new javax.swing.JLabel();
-        jLabel14 = new javax.swing.JLabel();
-        jLabel17 = new javax.swing.JLabel();
-        jLabel18 = new javax.swing.JLabel();
-        jLabel19 = new javax.swing.JLabel();
-        jLabel20 = new javax.swing.JLabel();
+        inputCon = new javax.swing.JLabel();
+        eventCon = new javax.swing.JLabel();
+        jLabel9 = new javax.swing.JLabel();
         displayCon = new javax.swing.JLabel();
         displayitCon = new javax.swing.JLabel();
-        displaycsCon = new javax.swing.JLabel();
-        displayisCon = new javax.swing.JLabel();
-        csCon = new javax.swing.JLabel();
-        csreceiverCon = new javax.swing.JLabel();
-        isCon = new javax.swing.JLabel();
-        isreceiverCon = new javax.swing.JLabel();
         about = new javax.swing.JDialog();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
@@ -778,6 +768,8 @@ public class Server extends javax.swing.JFrame {
         callAgain = new javax.swing.JButton();
         jLabel44 = new javax.swing.JLabel();
         remarks = new javax.swing.JTextField();
+        jLabel45 = new javax.swing.JLabel();
+        jLabel46 = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         adminMenu = new javax.swing.JMenuItem();
@@ -785,14 +777,10 @@ public class Server extends javax.swing.JFrame {
         jMenuItem2 = new javax.swing.JMenuItem();
         jMenuItem3 = new javax.swing.JMenuItem();
         viewISfile = new javax.swing.JMenu();
-        jMenuItem1 = new javax.swing.JMenuItem();
-        jMenuItem5 = new javax.swing.JMenuItem();
-        jSeparator2 = new javax.swing.JPopupMenu.Separator();
         viewITrecord = new javax.swing.JMenuItem();
-        jSeparator3 = new javax.swing.JPopupMenu.Separator();
         allIT = new javax.swing.JMenuItem();
-        jMenu3 = new javax.swing.JMenu();
-        jMenuItem4 = new javax.swing.JMenuItem();
+        jSeparator2 = new javax.swing.JPopupMenu.Separator();
+        jMenuItem5 = new javax.swing.JMenuItem();
 
         passwordDialog.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         passwordDialog.setTitle("Restricted Access");
@@ -1154,32 +1142,21 @@ public class Server extends javax.swing.JFrame {
 
         connectionStatusDiag.setTitle("System Status");
         connectionStatusDiag.setMinimumSize(new java.awt.Dimension(400, 320));
+        connectionStatusDiag.setResizable(false);
 
-        jLabel9.setText("Input Kiosk");
+        jLabel11.setText("Display");
+
+        jLabel10.setText("Input Kiosk Event Listener");
+
+        jLabel12.setText("Display IT Receiver");
 
         inputCon.setForeground(new java.awt.Color(204, 0, 0));
         inputCon.setText("Offline");
 
-        jLabel10.setText("Input Kiosk Event Listener");
-
         eventCon.setForeground(new java.awt.Color(204, 0, 0));
         eventCon.setText("Offline");
 
-        jLabel11.setText("Display");
-
-        jLabel12.setText("Display IT Receiver");
-
-        jLabel13.setText("Display CS Receiver");
-
-        jLabel14.setText("Display IS Receiver");
-
-        jLabel17.setText("CS Controller");
-
-        jLabel18.setText("CS Controller Receiver");
-
-        jLabel19.setText("IS Controller");
-
-        jLabel20.setText("IS Controller Receiver");
+        jLabel9.setText("Input Kiosk");
 
         displayCon.setForeground(new java.awt.Color(204, 0, 0));
         displayCon.setText("Offline");
@@ -1187,107 +1164,62 @@ public class Server extends javax.swing.JFrame {
         displayitCon.setForeground(new java.awt.Color(204, 0, 0));
         displayitCon.setText("Offline");
 
-        displaycsCon.setForeground(new java.awt.Color(204, 0, 0));
-        displaycsCon.setText("Offline");
-
-        displayisCon.setForeground(new java.awt.Color(204, 0, 0));
-        displayisCon.setText("Offline");
-
-        csCon.setForeground(new java.awt.Color(204, 0, 0));
-        csCon.setText("Offline");
-
-        csreceiverCon.setForeground(new java.awt.Color(204, 0, 0));
-        csreceiverCon.setText("Offline");
-
-        isCon.setForeground(new java.awt.Color(204, 0, 0));
-        isCon.setText("Offline");
-
-        isreceiverCon.setForeground(new java.awt.Color(204, 0, 0));
-        isreceiverCon.setText("Offline");
+        org.jdesktop.layout.GroupLayout jPanel7Layout = new org.jdesktop.layout.GroupLayout(jPanel7);
+        jPanel7.setLayout(jPanel7Layout);
+        jPanel7Layout.setHorizontalGroup(
+            jPanel7Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel7Layout.createSequentialGroup()
+                .addContainerGap()
+                .add(jPanel7Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(jLabel9)
+                    .add(jLabel10)
+                    .add(jLabel11)
+                    .add(jLabel12))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .add(jPanel7Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(displayitCon)
+                    .add(displayCon)
+                    .add(inputCon)
+                    .add(eventCon))
+                .addContainerGap())
+        );
+        jPanel7Layout.setVerticalGroup(
+            jPanel7Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel7Layout.createSequentialGroup()
+                .addContainerGap()
+                .add(jPanel7Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jLabel9)
+                    .add(inputCon))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jPanel7Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jLabel10)
+                    .add(eventCon))
+                .add(18, 18, 18)
+                .add(jPanel7Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jLabel11)
+                    .add(displayCon))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jPanel7Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jLabel12)
+                    .add(displayitCon))
+                .addContainerGap())
+        );
 
         org.jdesktop.layout.GroupLayout connectionStatusDiagLayout = new org.jdesktop.layout.GroupLayout(connectionStatusDiag.getContentPane());
         connectionStatusDiag.getContentPane().setLayout(connectionStatusDiagLayout);
         connectionStatusDiagLayout.setHorizontalGroup(
             connectionStatusDiagLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(connectionStatusDiagLayout.createSequentialGroup()
-                .addContainerGap()
-                .add(connectionStatusDiagLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(connectionStatusDiagLayout.createSequentialGroup()
-                        .add(connectionStatusDiagLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(jLabel9)
-                            .add(jLabel10)
-                            .add(jLabel11)
-                            .add(jLabel12)
-                            .add(jLabel13)
-                            .add(jLabel14))
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 30, Short.MAX_VALUE)
-                        .add(connectionStatusDiagLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(displayisCon)
-                            .add(displaycsCon)
-                            .add(displayitCon)
-                            .add(displayCon)
-                            .add(inputCon)
-                            .add(eventCon)))
-                    .add(connectionStatusDiagLayout.createSequentialGroup()
-                        .add(connectionStatusDiagLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(jLabel17)
-                            .add(jLabel18)
-                            .add(jLabel20)
-                            .add(jLabel19))
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 55, Short.MAX_VALUE)
-                        .add(connectionStatusDiagLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(csCon)
-                            .add(csreceiverCon)
-                            .add(isCon)
-                            .add(isreceiverCon))))
-                .add(143, 143, 143))
+                .add(20, 20, 20)
+                .add(jPanel7, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .add(20, 20, 20))
         );
         connectionStatusDiagLayout.setVerticalGroup(
             connectionStatusDiagLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(connectionStatusDiagLayout.createSequentialGroup()
-                .addContainerGap()
-                .add(connectionStatusDiagLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel9)
-                    .add(inputCon))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(connectionStatusDiagLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel10)
-                    .add(eventCon))
-                .add(18, 18, 18)
-                .add(connectionStatusDiagLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel11)
-                    .add(displayCon))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(connectionStatusDiagLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel12)
-                    .add(displayitCon))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(connectionStatusDiagLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel13)
-                    .add(displaycsCon))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(connectionStatusDiagLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel14)
-                    .add(displayisCon))
-                .add(18, 18, 18)
-                .add(connectionStatusDiagLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(connectionStatusDiagLayout.createSequentialGroup()
-                        .add(jLabel17)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jLabel18)
-                        .add(18, 18, 18)
-                        .add(jLabel19)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jLabel20))
-                    .add(connectionStatusDiagLayout.createSequentialGroup()
-                        .add(csCon)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(csreceiverCon)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 18, Short.MAX_VALUE)
-                        .add(isCon)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(isreceiverCon)))
-                .addContainerGap())
+                .add(20, 20, 20)
+                .add(jPanel7, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(10, 10, 10))
         );
 
         about.setTitle("Credits");
@@ -1620,7 +1552,7 @@ public class Server extends javax.swing.JFrame {
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
-        setTitle("UST IICS Queuing System Server");
+        setTitle("St. Jude College Queuing System Server");
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
@@ -1643,8 +1575,10 @@ public class Server extends javax.swing.JFrame {
             .add(logPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(logPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jScrollPane2)
-                    .add(jLabel21))
+                    .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 520, Short.MAX_VALUE)
+                    .add(logPanelLayout.createSequentialGroup()
+                        .add(jLabel21)
+                        .add(0, 0, 0)))
                 .addContainerGap())
         );
         logPanelLayout.setVerticalGroup(
@@ -1653,7 +1587,7 @@ public class Server extends javax.swing.JFrame {
                 .addContainerGap()
                 .add(jLabel21)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 149, Short.MAX_VALUE)
+                .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -1729,7 +1663,7 @@ public class Server extends javax.swing.JFrame {
                             .add(itConcernTxt)
                             .add(nextTxt)
                             .add(jLabel44))
-                        .add(0, 118, Short.MAX_VALUE)))
+                        .add(0, 220, Short.MAX_VALUE)))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -1757,6 +1691,15 @@ public class Server extends javax.swing.JFrame {
                     .add(jPanel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
+
+        jLabel45.setFont(new java.awt.Font("Impact", 0, 24)); // NOI18N
+        jLabel45.setForeground(new java.awt.Color(158, 0, 0));
+        jLabel45.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel45.setText("ST. JUDE COLLEGE");
+
+        jLabel46.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        jLabel46.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel46.setText("Queuing System");
 
         jMenu1.setText("Menu");
         jMenu1.addActionListener(new java.awt.event.ActionListener() {
@@ -1801,23 +1744,6 @@ public class Server extends javax.swing.JFrame {
             }
         });
 
-        jMenuItem1.setText("View All Queue");
-        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem1ActionPerformed(evt);
-            }
-        });
-        viewISfile.add(jMenuItem1);
-
-        jMenuItem5.setText("Connection Status");
-        jMenuItem5.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem5ActionPerformed(evt);
-            }
-        });
-        viewISfile.add(jMenuItem5);
-        viewISfile.add(jSeparator2);
-
         viewITrecord.setText("View Generated Queue Record");
         viewITrecord.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1825,7 +1751,6 @@ public class Server extends javax.swing.JFrame {
             }
         });
         viewISfile.add(viewITrecord);
-        viewISfile.add(jSeparator3);
 
         allIT.setText("Records Directory");
         allIT.addActionListener(new java.awt.event.ActionListener() {
@@ -1834,20 +1759,17 @@ public class Server extends javax.swing.JFrame {
             }
         });
         viewISfile.add(allIT);
+        viewISfile.add(jSeparator2);
 
-        jMenuBar1.add(viewISfile);
-
-        jMenu3.setText("Preferences");
-
-        jMenuItem4.setText("Limit per student");
-        jMenuItem4.addActionListener(new java.awt.event.ActionListener() {
+        jMenuItem5.setText("Connection Status");
+        jMenuItem5.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem4ActionPerformed(evt);
+                jMenuItem5ActionPerformed(evt);
             }
         });
-        jMenu3.add(jMenuItem4);
+        viewISfile.add(jMenuItem5);
 
-        jMenuBar1.add(jMenu3);
+        jMenuBar1.add(viewISfile);
 
         setJMenuBar(jMenuBar1);
 
@@ -1855,15 +1777,21 @@ public class Server extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(queueControlPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .add(logPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .add(queueControlPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .add(jLabel45, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .add(jLabel46, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
+                .add(jLabel45)
+                .add(1, 1, 1)
+                .add(jLabel46, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 27, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                 .add(queueControlPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(logPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .add(logPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
 
         queueControlPanel.getAccessibleContext().setAccessibleName("Queue Controller");
@@ -1928,7 +1856,7 @@ public class Server extends javax.swing.JFrame {
                     nextBT.setEnabled(enabled);
                     callAgain.setEnabled(enabled);
                     viewISfile.setEnabled(enabled);
-                    jMenu3.setEnabled(enabled);
+                    //jMenu3.setEnabled(enabled);
                     jMenuItem2.setEnabled(enabled);
                     jMenuItem3.setEnabled(enabled);
                     itUpcomingList.setEnabled(enabled);
@@ -2034,40 +1962,6 @@ public class Server extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_lunchActionPerformed
 
-    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-        /*try
-        {
-            BufferedReader csReader = new BufferedReader(new FileReader(ServerTest.csqueue));
-            BufferedReader isReader = new BufferedReader(new FileReader(ServerTest.isqueue));
-            String [] csQueueListData = new String[99];
-            String [] isQueueListData = new String[99];
-            String currentLine;
-            //for CS
-            for(int i=0;(currentLine = csReader.readLine())!=null; i++)
-                csQueueListData[i] = currentLine.substring(0, 10);
-            csReader.close();
-            csQueueList.setListData(csQueueListData);
-            //for IS
-            for(int i=0;(currentLine = isReader.readLine())!=null; i++)
-                isQueueListData[i] = currentLine.substring(0, 10);
-            isReader.close();
-            isQueueList.setListData(isQueueListData);
-            viewQueue.setLocationRelativeTo(null);
-            viewQueue.setVisible(true);
-        }
-        catch (IOException ioe)
-        {
-            Server.logg.append("Failed to read queue files.");
-        }*/
-    }//GEN-LAST:event_jMenuItem1ActionPerformed
-
-    private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
-        Global.passType = "setLimit";
-        passwordDialog.setTitle("Change Limit");
-        passwordDialog.setLocationRelativeTo(null);
-        passwordDialog.setVisible(true);
-    }//GEN-LAST:event_jMenuItem4ActionPerformed
-
     private void setLimitBTActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setLimitBTActionPerformed
         Global.max = Integer.parseInt(maxSpinner.getValue().toString());
         setLimit.hide();
@@ -2147,7 +2041,7 @@ public class Server extends javax.swing.JFrame {
             callAgain.setEnabled(enabled);
             jMenuBar1.setEnabled(enabled);
             viewISfile.setEnabled(enabled);
-            jMenu3.setEnabled(enabled);
+            //jMenu3.setEnabled(enabled);
             jMenuItem2.setEnabled(enabled);
             jMenuItem3.setEnabled(enabled);
             itUpcomingList.setEnabled(enabled);
@@ -2336,23 +2230,17 @@ public class Server extends javax.swing.JFrame {
     private javax.swing.JButton confirm;
     private javax.swing.JPasswordField confirmPW;
     private javax.swing.JDialog connectionStatusDiag;
-    public static javax.swing.JLabel csCon;
     public static javax.swing.JLabel csNowServing;
     private javax.swing.JList csQueueList;
     public static javax.swing.JScrollPane csQueueListScroll;
     public static javax.swing.JScrollPane csQueueListScroll1;
     public static javax.swing.JScrollPane csQueueListScroll2;
-    public static javax.swing.JLabel csreceiverCon;
     public static javax.swing.JLabel displayCon;
-    public static javax.swing.JLabel displaycsCon;
-    public static javax.swing.JLabel displayisCon;
     public static javax.swing.JLabel displayitCon;
     public static javax.swing.JLabel eventCon;
     public static javax.swing.JLabel inputCon;
-    public static javax.swing.JLabel isCon;
     public static javax.swing.JLabel isNowServing;
     private javax.swing.JList isQueueList;
-    public static javax.swing.JLabel isreceiverCon;
     public static javax.swing.JLabel itConcernTxt;
     public static javax.swing.JLabel itNowServing;
     public static javax.swing.JLabel itNowServingTxt;
@@ -2366,15 +2254,9 @@ public class Server extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel13;
-    private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
-    private javax.swing.JLabel jLabel17;
-    private javax.swing.JLabel jLabel18;
-    private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel22;
     private javax.swing.JLabel jLabel23;
@@ -2401,18 +2283,17 @@ public class Server extends javax.swing.JFrame {
     public static javax.swing.JLabel jLabel42;
     public static javax.swing.JLabel jLabel43;
     private javax.swing.JLabel jLabel44;
+    private javax.swing.JLabel jLabel45;
+    private javax.swing.JLabel jLabel46;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JMenu jMenu1;
-    private javax.swing.JMenu jMenu3;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
-    private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JMenuItem jMenuItem5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
@@ -2420,12 +2301,12 @@ public class Server extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator2;
-    private javax.swing.JPopupMenu.Separator jSeparator3;
     public static javax.swing.JSpinner jSpinner1;
     public static javax.swing.JSpinner jSpinner10;
     public static javax.swing.JSpinner jSpinner11;

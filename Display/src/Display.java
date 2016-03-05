@@ -1,5 +1,8 @@
 
 import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.DataInputStream;
@@ -13,12 +16,17 @@ import java.net.SocketException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.prefs.Preferences;
+import javax.imageio.ImageIO;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
+import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
+import javax.swing.Timer;
 import javax.swing.UIManager;
 
 /*
@@ -39,7 +47,8 @@ class Globalvars
     public static String [] upcomingIT = new String[99];
     public static int ITlastIndex = 0;
     public static BufferedWriter itWrite;
-
+    
+    public static boolean closing = false;
     public static boolean mac = false;
 
     public static void writeIT() throws IOException
@@ -110,7 +119,23 @@ class ITReceiverThread extends Thread
         }
         catch (IOException ioe)
         {
-            JOptionPane.showMessageDialog(null, "Error retreiving IS upcoming data from server.\nReal-time upcoming clients cannot be updated\nas of the moment. Basic operations can still continue.", "Retreive Failed", JOptionPane.ERROR_MESSAGE);
+            if(!Globalvars.closing)
+                JOptionPane.showMessageDialog(null, "Error retreiving upcoming data from server.\nReal-time upcoming clients cannot be updated\nas of the moment. Basic operations can still continue.", "Retreive Failed", JOptionPane.ERROR_MESSAGE);
+            else {
+                try {
+                    Display.client.close();
+                    Display.cutoffDialog.setFocusable(false);
+                    Display.cutoffDialog.setLocationRelativeTo(null);
+                    Display.cutoffDialog.setVisible(true);
+                    Globalvars.closing = true;
+                    Thread.sleep(30000);
+                    System.exit(0);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(ITReceiverThread.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(ITReceiverThread.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
         }
     }
 }
@@ -137,7 +162,8 @@ class Wait4Next extends Thread
                      Display.cutoffDialog.setFocusable(false);
                      Display.cutoffDialog.setLocationRelativeTo(null);
                      Display.cutoffDialog.setVisible(true);
-                     Thread.sleep(10000);
+                     Globalvars.closing = true;
+                     Thread.sleep(30000);
                      System.exit(0);
                  }
                  else if(received.equals("lunch"))
@@ -148,7 +174,8 @@ class Wait4Next extends Thread
                  {
                      if(!Display.ITserving.getText().contains("None"))
                      {
-                         AudioInputStream ais = AudioSystem.getAudioInputStream(new File("tone.wav"));
+                         //AudioInputStream ais = AudioSystem.getAudioInputStream(new File("tone.wav"));
+                         AudioInputStream ais = AudioSystem.getAudioInputStream(Display.class.getResourceAsStream("resources/tone.wav"));
                          Clip tone = AudioSystem.getClip();
                          tone.open(ais);
                          tone.start();
@@ -166,7 +193,8 @@ class Wait4Next extends Thread
                      //play notification
                      if(!studentNumber.equalsIgnoreCase("none"))
                      {
-                         AudioInputStream ais = AudioSystem.getAudioInputStream(new File("tone.wav"));
+                         //AudioInputStream ais = AudioSystem.getAudioInputStream(new File("tone.wav"));
+                         AudioInputStream ais = AudioSystem.getAudioInputStream(Display.class.getResourceAsStream("resources/tone.wav"));
                          Clip tone = AudioSystem.getClip();
                          tone.open(ais);
                          tone.start();
@@ -228,6 +256,23 @@ public class Display extends javax.swing.JFrame {
 
     public Display() {
         initComponents();
+        BufferedImage myPicture;
+        try {
+            myPicture = ImageIO.read(Display.class.getResourceAsStream("resources/mainlogo.png"));
+            //myPicture = ImageIO.read(new File("mainlogo.gif"));
+            //picLabel = new javax.swing.JLabel(new ImageIcon(myPicture));
+            picLabel.setIcon(new ImageIcon(myPicture));
+            picLabel.setText("");
+        } catch (IOException ex) {
+            Logger.getLogger(Display.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        ActionListener updateClockAction = new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                clockLabel.setText(new SimpleDateFormat("EEE, MMM dd, yyyy - hh:mm:ss a").format(new Date())); 
+            }
+        };
+        Timer t = new Timer(1000, updateClockAction);
+        t.start();
         if(prefs.get("SERVERIP", "").isEmpty()) {
             ConnectToServerBT.requestFocus();
             progress.setVisible(false);
@@ -296,23 +341,14 @@ public class Display extends javax.swing.JFrame {
         jLabel8 = new javax.swing.JLabel();
         jLabel12 = new javax.swing.JLabel();
         ConnectToServerBT = new javax.swing.JButton();
-        jLabel3 = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
-        jPanel1 = new javax.swing.JPanel();
-        CSserving = new javax.swing.JLabel();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        CSupcoming = new javax.swing.JList();
-        jLabel10 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
-        ITserving = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         ITupcoming = new javax.swing.JList();
-        jLabel9 = new javax.swing.JLabel();
-        jPanel3 = new javax.swing.JPanel();
-        ISserving = new javax.swing.JLabel();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        ISupcoming = new javax.swing.JList();
-        jLabel11 = new javax.swing.JLabel();
+        ITserving = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        clockLabel = new javax.swing.JLabel();
+        picLabel = new javax.swing.JLabel();
 
         connectToServer.setTitle("Connect to Server");
         connectToServer.setMinimumSize(new java.awt.Dimension(270, 165));
@@ -444,18 +480,19 @@ public class Display extends javax.swing.JFrame {
         );
 
         cutoffDialog.setTitle("End of Day Cut-off");
+        cutoffDialog.setAlwaysOnTop(true);
         cutoffDialog.setAutoRequestFocus(false);
         cutoffDialog.setFocusable(false);
         cutoffDialog.setFocusableWindowState(false);
-        cutoffDialog.setMinimumSize(new java.awt.Dimension(539, 176));
+        cutoffDialog.setMinimumSize(new java.awt.Dimension(600, 200));
 
         jLabel7.setFont(new java.awt.Font("Tahoma", 0, 36)); // NOI18N
         jLabel7.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel7.setText("UST IICS Queuing System");
+        jLabel7.setText("St. Jude College Queuing System");
 
         jLabel8.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
         jLabel8.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel8.setText("Thank you for paitiently waiting.");
+        jLabel8.setText("Thank you");
 
         jLabel12.setFont(new java.awt.Font("Tahoma", 0, 36)); // NOI18N
         jLabel12.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -468,25 +505,25 @@ public class Display extends javax.swing.JFrame {
             .addGroup(cutoffDialogLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(cutoffDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel7, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel8, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel12, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jLabel7, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 835, Short.MAX_VALUE)
+                    .addComponent(jLabel8, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 835, Short.MAX_VALUE)
+                    .addComponent(jLabel12, javax.swing.GroupLayout.DEFAULT_SIZE, 835, Short.MAX_VALUE))
                 .addContainerGap())
         );
         cutoffDialogLayout.setVerticalGroup(
             cutoffDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(cutoffDialogLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel7)
+                .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, 59, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel12)
+                .addComponent(jLabel12, javax.swing.GroupLayout.DEFAULT_SIZE, 59, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jLabel8)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jLabel8, javax.swing.GroupLayout.DEFAULT_SIZE, 45, Short.MAX_VALUE)
+                .addGap(31, 31, 31))
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("UST IICS Queuing System - " + dateFormat.format(date));
+        setTitle("St. Jude College Queuing System - " + dateFormat.format(date));
 
         ConnectToServerBT.setFont(new java.awt.Font("Lucida Grande", 1, 24)); // NOI18N
         ConnectToServerBT.setText("Status: Not Connected");
@@ -496,60 +533,10 @@ public class Display extends javax.swing.JFrame {
             }
         });
 
-        jLabel3.setFont(new java.awt.Font("Lucida Grande", 0, 36)); // NOI18N
-        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel3.setText("Now Serving");
-
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Computer Science", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 18), new java.awt.Color(0, 51, 153))); // NOI18N
-
-        CSserving.setFont(new java.awt.Font("Lucida Grande", 0, 48)); // NOI18N
-        CSserving.setForeground(new java.awt.Color(0, 51, 153));
-        CSserving.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        CSserving.setText("None");
-
-        CSupcoming.setFont(new java.awt.Font("Lucida Grande", 0, 24)); // NOI18N
-        jScrollPane2.setViewportView(CSupcoming);
-
-        jLabel10.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jLabel10.setText("Next:");
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addComponent(CSserving, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel10)
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(CSserving)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel10)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Information Technology", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 18), new java.awt.Color(0, 102, 0))); // NOI18N
-
-        ITserving.setFont(new java.awt.Font("Lucida Grande", 0, 48)); // NOI18N
-        ITserving.setForeground(new java.awt.Color(0, 153, 0));
-        ITserving.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        ITserving.setText("None");
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Queue", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 18), new java.awt.Color(0, 102, 0))); // NOI18N
 
         ITupcoming.setFont(new java.awt.Font("Lucida Grande", 0, 24)); // NOI18N
         jScrollPane1.setViewportView(ITupcoming);
-
-        jLabel9.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jLabel9.setText("Next:");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -557,62 +544,29 @@ public class Display extends javax.swing.JFrame {
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 275, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup()
-                        .addComponent(jLabel9)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(ITserving, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 275, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addComponent(ITserving)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel9)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 218, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-
-        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Information Systems", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 18), new java.awt.Color(255, 102, 0))); // NOI18N
-
-        ISserving.setFont(new java.awt.Font("Lucida Grande", 0, 48)); // NOI18N
-        ISserving.setForeground(new java.awt.Color(255, 102, 0));
-        ISserving.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        ISserving.setText("None");
-
-        ISupcoming.setFont(new java.awt.Font("Lucida Grande", 0, 24)); // NOI18N
-        jScrollPane3.setViewportView(ISupcoming);
-
-        jLabel11.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jLabel11.setText("Next:");
-
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addComponent(ISserving, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(jLabel11)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addComponent(jScrollPane1)
                 .addContainerGap())
         );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addComponent(ISserving)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel11)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                .addContainerGap())
-        );
+
+        ITserving.setFont(new java.awt.Font("Lucida Grande", 0, 60)); // NOI18N
+        ITserving.setForeground(new java.awt.Color(0, 153, 0));
+        ITserving.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        ITserving.setText("None");
+
+        jLabel3.setFont(new java.awt.Font("Lucida Grande", 0, 36)); // NOI18N
+        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel3.setText("Now Serving");
+
+        clockLabel.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        clockLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        clockLabel.setText("Clock");
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -621,40 +575,51 @@ public class Display extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(113, 113, 113)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(351, 351, 351))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(ITserving, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, 496, Short.MAX_VALUE)
+                    .addComponent(clockLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
-                .addGap(0, 0, 0)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
-                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap())
-                    .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel3)
+                        .addGap(18, 18, 18)
+                        .addComponent(ITserving, javax.swing.GroupLayout.DEFAULT_SIZE, 270, Short.MAX_VALUE)
+                        .addGap(18, 18, 18)
+                        .addComponent(clockLabel))
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
+
+        picLabel.setFont(new java.awt.Font("Impact", 0, 60)); // NOI18N
+        picLabel.setForeground(new java.awt.Color(158, 0, 0));
+        picLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        picLabel.setText("ST. JUDE COLLEGE");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(ConnectToServerBT, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(ConnectToServerBT, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
-            .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(picLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addComponent(jLabel3)
-                .addGap(1, 1, 1)
+                .addContainerGap()
+                .addComponent(picLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(ConnectToServerBT, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -768,22 +733,17 @@ public class Display extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel CSserving;
-    private javax.swing.JList CSupcoming;
     private javax.swing.JButton ConnectNow;
     public static javax.swing.JButton ConnectToServerBT;
-    private javax.swing.JLabel ISserving;
-    private javax.swing.JList ISupcoming;
     public static javax.swing.JLabel ITserving;
     public static javax.swing.JList ITupcoming;
     private javax.swing.JTextField ServerIPTextField;
     private javax.swing.JDialog Success;
     private javax.swing.JButton cancel;
+    public static javax.swing.JLabel clockLabel;
     private javax.swing.JDialog connectToServer;
     public static javax.swing.JDialog cutoffDialog;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
-    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -792,15 +752,11 @@ public class Display extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JButton okButton;
+    public static javax.swing.JLabel picLabel;
     private javax.swing.JTextField portTextField;
     private javax.swing.JProgressBar progress;
     // End of variables declaration//GEN-END:variables
