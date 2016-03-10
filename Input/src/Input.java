@@ -129,14 +129,14 @@ public class Input extends javax.swing.JFrame {
         }
         catch (Exception e)
         {
-            JOptionPane.showMessageDialog(rootPane, "Sorry, your student number cannot be added right now. Please inform the system administrator.", "Sending Failed", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(rootPane, "Sorry, your name cannot be added right now. Please inform the system administrator.", "Sending Failed", JOptionPane.ERROR_MESSAGE);
         }
 
         try
         {
             position = inFromServer.readUTF();
             if(position.equalsIgnoreCase("duplicate"))
-                JOptionPane.showMessageDialog(rootPane, "Student Number " + StudentNumber.getText() + " has already been added to the queue", "Duplicate Detected", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(rootPane, "The name " + StudentNumber.getText() + " has already been added to the queue", "Duplicate Detected", JOptionPane.ERROR_MESSAGE);
             //else if(position.equalsIgnoreCase("abuse"))
             //    JOptionPane.showMessageDialog(rootPane, "Student Number " + StudentNumber.getText() + " has already reached its maximum limit per day", "Exceeded Maximum Transaction", JOptionPane.ERROR_MESSAGE);
             else
@@ -290,7 +290,7 @@ public class Input extends javax.swing.JFrame {
             }
         });
 
-        jLabel6.setText("Please wait for your student number to flash on the screen.");
+        jLabel6.setText("Please wait for your name to flash on the screen.");
 
         positionLabel.setFont(new java.awt.Font("Lucida Grande", 0, 24)); // NOI18N
         positionLabel.setText("nth");
@@ -405,7 +405,7 @@ public class Input extends javax.swing.JFrame {
             }
         });
 
-        jLabel9.setText("Format: Lastname, F");
+        jLabel9.setText("Format: Lastname, F. M.");
 
         concern.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Request for TRANSCRIPT", "Request for DIPLOMA", "Request for COPY OF GRADES", "Request for CTC/HD", "Request for CAV", "Request for CERTIFIED TRUE COPY", "Request for LICENSURE/INTERNSHIP", "Certificate of GRADUATION", "Certificate of GRADES", "Certificate of ENROLLMENT", "Certificate of G.W.A.", "Certificate of UNITS EARNED", "Certificate of COURSE DESCRIPTION" }));
         concern.setEnabled(false);
@@ -473,7 +473,7 @@ public class Input extends javax.swing.JFrame {
                             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(ConnectToServerBT)
-                                .addGap(0, 169, Short.MAX_VALUE)))))
+                                .addGap(0, 0, Short.MAX_VALUE)))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -626,7 +626,7 @@ public class Input extends javax.swing.JFrame {
         }
         catch (IOException ioe)
         {
-                JOptionPane.showMessageDialog(rootPane, "Failed to add your student number", "Connection Error", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(rootPane, "Failed to add your name", "Connection Error", JOptionPane.WARNING_MESSAGE);
                 ioe.printStackTrace();
         }
         Success.dispose();

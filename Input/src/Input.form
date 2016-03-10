@@ -265,7 +265,7 @@
                           <Component id="jPanel1" max="32767" attributes="0"/>
                           <Group type="102" attributes="0">
                               <Component id="ConnectToServerBT" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace min="0" pref="169" max="32767" attributes="0"/>
+                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                   </Group>
@@ -427,7 +427,7 @@
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel9">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Format: Lastname, F"/>
+            <Property name="text" type="java.lang.String" value="Format: Lastname, F. M."/>
           </Properties>
         </Component>
         <Component class="javax.swing.JComboBox" name="concern">
