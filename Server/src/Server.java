@@ -617,7 +617,7 @@ public class Server extends javax.swing.JFrame {
                     else
                     {
                         BufferedWriter br = new BufferedWriter(new FileWriter(ServerTest.itQueueRecord));
-                        br.write("Time,Student Number,Concern,Remarks");
+                        br.write("Time,Student Name,Concern,Remarks");
                         br.newLine();
                         br.close();
                     }
@@ -771,7 +771,6 @@ public class Server extends javax.swing.JFrame {
         jMenu1 = new javax.swing.JMenu();
         adminMenu = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
-        jMenuItem2 = new javax.swing.JMenuItem();
         jMenuItem3 = new javax.swing.JMenuItem();
         viewISfile = new javax.swing.JMenu();
         viewITrecord = new javax.swing.JMenuItem();
@@ -1228,7 +1227,7 @@ public class Server extends javax.swing.JFrame {
 
         jLabel3.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
         jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel3.setText("Patrick Joshua Saguinsin");
+        jLabel3.setText("Jasmine Eve Utzabia / Patrick Joshua Saguinsin");
 
         jLabel7.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel7.setText("Project Manager, System Programmer, GUI Designer");
@@ -1582,7 +1581,7 @@ public class Server extends javax.swing.JFrame {
                 .addContainerGap()
                 .add(jLabel21)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
+                .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 234, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -1714,14 +1713,6 @@ public class Server extends javax.swing.JFrame {
         jMenu1.add(adminMenu);
         jMenu1.add(jSeparator1);
 
-        jMenuItem2.setText("About IICS Queuing System");
-        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem2ActionPerformed(evt);
-            }
-        });
-        jMenu1.add(jMenuItem2);
-
         jMenuItem3.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Q, java.awt.event.InputEvent.CTRL_MASK));
         jMenuItem3.setText("Exit");
         jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
@@ -1787,7 +1778,7 @@ public class Server extends javax.swing.JFrame {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                 .add(queueControlPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(logPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .add(logPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -1851,7 +1842,7 @@ public class Server extends javax.swing.JFrame {
                     callAgain.setEnabled(enabled);
                     viewISfile.setEnabled(enabled);
                     //jMenu3.setEnabled(enabled);
-                    jMenuItem2.setEnabled(enabled);
+                    //jMenuItem2.setEnabled(enabled);
                     jMenuItem3.setEnabled(enabled);
                     itUpcomingList.setEnabled(enabled);
                 }
@@ -1974,11 +1965,6 @@ public class Server extends javax.swing.JFrame {
         adminMode.hide();
     }//GEN-LAST:event_jButton4ActionPerformed
 
-    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
-        about.setLocationRelativeTo(null);
-        about.setVisible(true);
-    }//GEN-LAST:event_jMenuItem2ActionPerformed
-
     private void cancelChangePortActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelChangePortActionPerformed
         changePortsDialog.dispose();
     }//GEN-LAST:event_cancelChangePortActionPerformed
@@ -2036,7 +2022,7 @@ public class Server extends javax.swing.JFrame {
             jMenuBar1.setEnabled(enabled);
             viewISfile.setEnabled(enabled);
             //jMenu3.setEnabled(enabled);
-            jMenuItem2.setEnabled(enabled);
+            //jMenuItem2.setEnabled(enabled);
             jMenuItem3.setEnabled(enabled);
             itUpcomingList.setEnabled(enabled);
 
@@ -2147,7 +2133,7 @@ public class Server extends javax.swing.JFrame {
                 if(System.getProperty("os.name").contains("Mac OS X"))
                     Global.mac = true;
                 initJSpinners();
-                logg.append("Welcome UST IICS Queuing System!\n");
+                logg.append("Welcome to St. Jude College Queuing System!\n");
                   int port1, port2, port3, port4, port5, port6, port7, port8, port9, port10;
                       port1=Integer.parseInt(jSpinner1.getValue().toString());   //input
                       port2=Integer.parseInt(jSpinner2.getValue().toString());   //Controller CS
@@ -2286,7 +2272,6 @@ public class Server extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel9;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem5;
     private javax.swing.JPanel jPanel1;
